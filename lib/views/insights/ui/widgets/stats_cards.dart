@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 class StatsCards extends StatelessWidget {
   final double avgMood;
@@ -21,7 +22,8 @@ class StatsCards extends StatelessWidget {
             icon: Icons.sentiment_satisfied_rounded,
             value: avgMood.toStringAsFixed(1),
             label: 'Avg Mood',
-            color: const Color(0xFF7CB342),
+            backgroundColor: AppColors.primaryGreen,
+            color: AppColors.textColor,
           ),
         ),
         const SizedBox(width: 12),
@@ -30,7 +32,8 @@ class StatsCards extends StatelessWidget {
             icon: Icons.bolt,
             value: '$avgEnergy%',
             label: 'Avg Energy',
-            color: const Color(0xFFFFA726),
+            backgroundColor: AppColors.orangeAccent,
+            color: AppColors.textColor,
           ),
         ),
         const SizedBox(width: 12),
@@ -39,7 +42,8 @@ class StatsCards extends StatelessWidget {
             icon: Icons.air,
             value: '$avgStress%',
             label: 'Avg Stress',
-            color: const Color(0xFF29B6F6),
+            backgroundColor: AppColors.lightBlueAccent,
+            color: AppColors.textColor,
           ),
         ),
       ],
@@ -51,11 +55,12 @@ class StatsCards extends StatelessWidget {
     required String value,
     required String label,
     required Color color,
+    required Color backgroundColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
@@ -64,7 +69,7 @@ class StatsCards extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: backgroundColor,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 28),
@@ -73,8 +78,9 @@ class StatsCards extends StatelessWidget {
           Text(
             value,
             style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
+              color: AppColors.textColor,
+              fontSize: 20,
+              height: 28 / 20,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -82,8 +88,9 @@ class StatsCards extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: AppColors.text2Color,
               fontSize: 12,
+              height: 16 / 12,
             ),
           ),
         ],

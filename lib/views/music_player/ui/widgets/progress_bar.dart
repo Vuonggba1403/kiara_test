@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 /// Displays the playback progress bar with time indicators
 class MusicProgressBar extends StatelessWidget {
@@ -63,9 +64,9 @@ class MusicProgressBar extends StatelessWidget {
             trackHeight: 3,
             thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 0),
             overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
-            activeTrackColor: const Color(0xFF8BC34A),
+            activeTrackColor: AppColors.lightGreen,
             inactiveTrackColor: Colors.white.withOpacity(0.2),
-            overlayColor: const Color(0xFF8BC34A).withOpacity(0.3),
+            overlayColor: AppColors.lightGreen.withOpacity(0.3),
           ),
           child: Slider(
             value: _calculateSliderValue(),

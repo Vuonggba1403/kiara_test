@@ -15,7 +15,6 @@ class MiniPlayerWidget extends StatelessWidget {
         }
 
         final song = _extractSong(state);
-        final currentPosition = _extractPosition(state);
         final isPlaying = state is GlobalMusicPlayerPlaying;
 
         return Container(
@@ -44,16 +43,6 @@ class MiniPlayerWidget extends StatelessWidget {
       return state.currentSong;
     }
     throw Exception('Invalid state');
-  }
-
-  /// Extract position from state
-  Duration _extractPosition(GlobalMusicPlayerState state) {
-    if (state is GlobalMusicPlayerPlaying) {
-      return state.currentPosition;
-    } else if (state is GlobalMusicPlayerPaused) {
-      return state.currentPosition;
-    }
-    return Duration.zero;
   }
 
   BoxDecoration _buildDecoration(BuildContext context) {

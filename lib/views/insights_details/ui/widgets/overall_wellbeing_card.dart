@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 class OverallWellbeingCard extends StatelessWidget {
   final int overallWellbeing;
@@ -21,15 +22,15 @@ class OverallWellbeingCard extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF2D4A2B).withOpacity(0.6),
-            const Color(0xFF1E3A1E).withOpacity(0.4),
+            AppColors.wellbeingGradientStart.withOpacity(0.6),
+            AppColors.wellbeingGradientEnd.withOpacity(0.4),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFF7CB342).withOpacity(0.3),
+          color: AppColors.primaryGreen.withOpacity(0.3),
           width: 1,
         ),
       ),
@@ -41,12 +42,12 @@ class OverallWellbeingCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7CB342).withOpacity(0.2),
+                  color: AppColors.primaryGreen.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
                   Icons.auto_awesome,
-                  color: Color(0xFF7CB342),
+                  color: AppColors.textColor,
                   size: 24,
                 ),
               ),
@@ -57,7 +58,7 @@ class OverallWellbeingCard extends StatelessWidget {
                   const Text(
                     'Overall Wellbeing',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: AppColors.textColor,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
@@ -65,7 +66,7 @@ class OverallWellbeingCard extends StatelessWidget {
                   Text(
                     'Last 30 days',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: AppColors.textColor.withOpacity(0.6),
                       fontSize: 13,
                     ),
                   ),
@@ -77,7 +78,7 @@ class OverallWellbeingCard extends StatelessWidget {
           Text(
             insightText,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.9),
+              color: AppColors.textColor.withOpacity(0.9),
               fontSize: 14,
               height: 1.5,
             ),
@@ -89,7 +90,7 @@ class OverallWellbeingCard extends StatelessWidget {
                 child: _buildMetric(
                   '$overallWellbeing%',
                   'Wellbeing',
-                  const Color(0xFF7CB342),
+                  AppColors.primaryGreen,
                 ),
               ),
               const SizedBox(width: 12),
@@ -97,7 +98,7 @@ class OverallWellbeingCard extends StatelessWidget {
                 child: _buildMetric(
                   '+$growth%',
                   'Growth',
-                  const Color(0xFF66BB6A),
+                  AppColors.softerGreen,
                 ),
               ),
               const SizedBox(width: 12),
@@ -105,7 +106,7 @@ class OverallWellbeingCard extends StatelessWidget {
                 child: _buildMetric(
                   '$checkIns',
                   'Check-ins',
-                  const Color(0xFF42A5F5),
+                  AppColors.blueAccent,
                 ),
               ),
             ],
@@ -117,9 +118,9 @@ class OverallWellbeingCard extends StatelessWidget {
 
   Widget _buildMetric(String value, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B).withOpacity(0.5),
+        color: AppColors.cardDark.withOpacity(0.5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -128,7 +129,7 @@ class OverallWellbeingCard extends StatelessWidget {
             value,
             style: TextStyle(
               color: color,
-              fontSize: 24,
+              fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -136,7 +137,7 @@ class OverallWellbeingCard extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: AppColors.textColor.withOpacity(0.6),
               fontSize: 12,
             ),
           ),

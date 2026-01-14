@@ -1,14 +1,13 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:kiara_app_test/views/home/ui/home_page.dart';
+import 'package:kiara_app_test/views/common_page.dart';
 import 'package:kiara_app_test/views/insights/ui/insights_page.dart';
-import 'package:kiara_app_test/views/kiara_chat/ui/kiara_chat_page.dart';
 import 'package:kiara_app_test/views/main_tab/logic/cubit/main_tab_cubit.dart';
 import 'package:kiara_app_test/views/main_tab/ui/widgets/tab_button.dart';
-import 'package:kiara_app_test/views/profiles/ui/profile_page.dart';
-import 'package:kiara_app_test/views/sounds/ui/sounds_page.dart';
+
 import 'package:kiara_app_test/views/music_player/ui/widgets/mini_player.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 class MainTabView extends StatefulWidget {
   const MainTabView({super.key});
@@ -45,11 +44,13 @@ class _MainTabViewState extends State<MainTabView> {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => MainTabCubit(),
-      child: BlocBuilder<MainTabCubit, int>(
-        builder: (context, currentIndex) {
+      child: BlocBuilder<MainTabCubit, MainTabState>(
+        builder: (context, state) {
+          final currentIndex = state is MainTabIndexChanged ? state.index : 1;
           return Scaffold(
             backgroundColor: Colors.transparent,
             extendBody: true,
+            extendBodyBehindAppBar: true,
             body: Stack(
               children: [
                 // Main content
@@ -57,12 +58,12 @@ class _MainTabViewState extends State<MainTabView> {
                   controller: _pageController,
                   physics: const BouncingScrollPhysics(),
                   onPageChanged: context.read<MainTabCubit>().changeIndex,
-                  children: const [
-                    HomePage(),
+                  children: [
+                    CommonPage(),
                     InsightsPage(),
-                    KiaraChatPage(),
-                    SoundsPage(),
-                    ProfilePage(),
+                    CommonPage(),
+                    CommonPage(),
+                    CommonPage(),
                   ],
                 ),
                 // Mini player overlay
@@ -85,11 +86,11 @@ class _MainTabViewState extends State<MainTabView> {
   Widget _buildBottomNavigationBar(int currentIndex) {
     return Container(
       margin: const EdgeInsets.all(16),
+
       height: 80,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
         boxShadow: const [
           BoxShadow(
             color: Colors.black12,
@@ -100,78 +101,94 @@ class _MainTabViewState extends State<MainTabView> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final tabWidth = constraints.maxWidth / 5;
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                // Animated selection indicator
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeInOutCubic,
-                  left: tabWidth * currentIndex + (tabWidth * 0.1),
-                  top: 10,
-                  bottom: 10,
-                  width: tabWidth * 0.8,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF7CB342), Color(0xFF7CB342)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-                // Tab buttons
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: Colors.white.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final tabWidth = constraints.maxWidth / 5;
+                return Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Expanded(
-                      child: TabButton(
-                        icon: FontAwesomeIcons.houseChimney,
-                        label: "Home",
-                        isActive: currentIndex == 0,
-                        onTap: () => _navigateToPage(0),
+                    // Animated selection indicator
+                    AnimatedPositioned(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOutCubic,
+                      left: tabWidth * currentIndex + (tabWidth * 0.1),
+                      top: 10,
+                      bottom: 10,
+                      width: tabWidth * 0.8,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.primaryGreen,
+                              AppColors.primaryGreen,
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
                     ),
-                    Expanded(
-                      child: TabButton(
-                        icon: FontAwesomeIcons.chartColumn,
-                        label: "Insights",
-                        isActive: currentIndex == 1,
-                        onTap: () => _navigateToPage(1),
-                      ),
-                    ),
-                    Expanded(
-                      child: TabButton(
-                        icon: FontAwesomeIcons.message,
-                        label: "Kiara",
-                        isActive: currentIndex == 2,
-                        onTap: () => _navigateToPage(2),
-                      ),
-                    ),
-                    Expanded(
-                      child: TabButton(
-                        icon: FontAwesomeIcons.music,
-                        label: "Sounds",
-                        isActive: currentIndex == 3,
-                        onTap: () => _navigateToPage(3),
-                      ),
-                    ),
-                    Expanded(
-                      child: TabButton(
-                        icon: FontAwesomeIcons.user,
-                        label: "Profile",
-                        isActive: currentIndex == 4,
-                        onTap: () => _navigateToPage(4),
-                      ),
+                    // Tab buttons
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: TabButton(
+                            iconPath: 'assets/image/home.png',
+                            label: "Home",
+                            isActive: currentIndex == 0,
+                            onTap: () => _navigateToPage(0),
+                          ),
+                        ),
+                        Expanded(
+                          child: TabButton(
+                            iconPath: 'assets/image/insights.png',
+                            label: "Insights",
+                            isActive: currentIndex == 1,
+                            onTap: () => _navigateToPage(1),
+                          ),
+                        ),
+                        Expanded(
+                          child: TabButton(
+                            iconPath: 'assets/image/mess.png',
+                            label: "Kiara",
+                            isActive: currentIndex == 2,
+                            onTap: () => _navigateToPage(2),
+                          ),
+                        ),
+                        Expanded(
+                          child: TabButton(
+                            iconPath: 'assets/image/sounds.png',
+                            label: "Sounds",
+                            isActive: currentIndex == 3,
+                            onTap: () => _navigateToPage(3),
+                          ),
+                        ),
+                        Expanded(
+                          child: TabButton(
+                            iconPath: 'assets/image/user.png',
+                            label: "Profile",
+                            isActive: currentIndex == 4,
+                            onTap: () => _navigateToPage(4),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
-                ),
-              ],
-            );
-          },
+                );
+              },
+            ),
+          ),
         ),
       ),
     );

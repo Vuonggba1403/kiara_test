@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
-/// A custom tab button widget for the bottom navigation bar
 class TabButton extends StatelessWidget {
-  final IconData icon;
+  final String iconPath;
   final String label;
   final VoidCallback onTap;
   final bool isActive;
 
   const TabButton({
     super.key,
-    required this.icon,
+    required this.iconPath,
     required this.label,
     required this.isActive,
     required this.onTap,
@@ -25,10 +25,10 @@ class TabButton extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon,
+            ImageIcon(
+              AssetImage(iconPath),
               size: 26,
-              color: isActive ? Colors.white : const Color(0xFF64748B),
+              color: isActive ? Colors.white : AppColors.mutedText,
             ),
             const SizedBox(height: 6),
             Text(
@@ -36,7 +36,7 @@ class TabButton extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                color: isActive ? Colors.white : const Color(0xFF64748B),
+                color: isActive ? Colors.white : AppColors.mutedText,
               ),
             ),
           ],

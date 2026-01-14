@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
 import 'package:kiara_app_test/views/music_player/ui/music_player_page.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 /// Mini player that shows at bottom when music is playing
 class MiniPlayer extends StatelessWidget {
@@ -50,7 +51,10 @@ class MiniPlayer extends StatelessWidget {
                   Container(
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Color(0xFF558B2F), Color(0xFF33691E)],
+                        colors: [
+                          AppColors.primaryGreenDark,
+                          AppColors.primaryGreenDarker,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -151,7 +155,7 @@ class MiniPlayer extends StatelessWidget {
                       value: progress,
                       backgroundColor: Colors.white.withOpacity(0.2),
                       valueColor: const AlwaysStoppedAnimation<Color>(
-                        Color(0xFF8BC34A),
+                        AppColors.lightGreen,
                       ),
                       minHeight: 3,
                     ),

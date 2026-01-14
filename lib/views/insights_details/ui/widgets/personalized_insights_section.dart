@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kiara_app_test/views/insights_details/logic/cubit/insight_details_cubit.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
+import 'package:kiara_app_test/core/models/wellbeing_models.dart';
 
 class PersonalizedInsightsSection extends StatelessWidget {
   final List<PersonalizedInsight> insights;
@@ -14,7 +15,7 @@ class PersonalizedInsightsSection extends StatelessWidget {
         const Text(
           'Personalized Insights',
           style: TextStyle(
-            color: Colors.white,
+            color: AppColors.textColor,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
@@ -34,20 +35,27 @@ class PersonalizedInsightsSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: AppColors.textColor.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
+            height: 110,
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: insight.color.withOpacity(0.2),
+              color: insight.color,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(insight.icon, color: insight.color, size: 28),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Icon(insight.icon, color: AppColors.textColor, size: 28),
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -57,7 +65,7 @@ class PersonalizedInsightsSection extends StatelessWidget {
                 Text(
                   insight.title,
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textColor,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -66,7 +74,7 @@ class PersonalizedInsightsSection extends StatelessWidget {
                 Text(
                   insight.description,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.7),
+                    color: AppColors.textColor.withOpacity(0.7),
                     fontSize: 14,
                     height: 1.5,
                   ),

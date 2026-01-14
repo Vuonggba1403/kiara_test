@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
+// Giả định AppColors được định nghĩa ở đây hoặc import từ file của bạn
+// import 'package:kiara_app_test/core/theme/app_colors.dart';
 
 class MoodCalendar extends StatefulWidget {
   final Set<DateTime> moodDates;
@@ -11,49 +14,46 @@ class MoodCalendar extends StatefulWidget {
 }
 
 class _MoodCalendarState extends State<MoodCalendar> {
-  late DateTime _currentMonth;
+  late DateTime _focusedMonth;
 
   @override
   void initState() {
     super.initState();
-    _currentMonth = DateTime.now();
+    _focusedMonth = DateTime.now();
   }
 
-  void _previousMonth() {
+  // --- Logic Helpers ---
+  void _updateMonth(int offset) {
     setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
+      _focusedMonth = DateTime(
+        _focusedMonth.year,
+        _focusedMonth.month + offset,
+      );
     });
   }
 
-  void _nextMonth() {
-    setState(() {
-      _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
-    });
+  bool _isSameDay(DateTime date1, DateTime date2) {
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
-  bool _hasMoodData(DateTime date) {
-    return widget.moodDates.any(
-      (moodDate) =>
-          moodDate.year == date.year &&
-          moodDate.month == date.month &&
-          moodDate.day == date.day,
-    );
-  }
-
+  // --- UI Components ---
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(color: AppColors.textColor.withOpacity(0.1)),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           _buildHeader(),
           const SizedBox(height: 20),
-          _buildWeekDays(),
+          _buildWeekDayLabels(),
           const SizedBox(height: 12),
           _buildCalendarGrid(),
         ],
@@ -66,26 +66,22 @@ class _MoodCalendarState extends State<MoodCalendar> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
-          DateFormat('MMMM yyyy').format(_currentMonth),
-          style: const TextStyle(
-            color: Colors.white,
+          DateFormat('MMMM yyyy').format(_focusedMonth),
+          style: TextStyle(
+            color: AppColors.textColor,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         Row(
           children: [
-            IconButton(
-              onPressed: _previousMonth,
-              icon: const Icon(Icons.chevron_left),
-              color: Colors.white.withOpacity(0.7),
-              iconSize: 24,
+            _MonthNavButton(
+              icon: Icons.chevron_left,
+              onPressed: () => _updateMonth(-1),
             ),
-            IconButton(
-              onPressed: _nextMonth,
-              icon: const Icon(Icons.chevron_right),
-              color: Colors.white.withOpacity(0.7),
-              iconSize: 24,
+            _MonthNavButton(
+              icon: Icons.chevron_right,
+              onPressed: () => _updateMonth(1),
             ),
           ],
         ),
@@ -93,98 +89,125 @@ class _MoodCalendarState extends State<MoodCalendar> {
     );
   }
 
-  Widget _buildWeekDays() {
-    final weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  Widget _buildWeekDayLabels() {
+    const weekDays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: weekDays.map((day) {
-        return Expanded(
-          child: Center(
-            child: Text(
-              day,
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.5),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+      children: weekDays
+          .map(
+            (day) => Expanded(
+              child: Center(
+                child: Text(
+                  day,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.5),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
             ),
-          ),
-        );
-      }).toList(),
+          )
+          .toList(),
     );
   }
 
   Widget _buildCalendarGrid() {
-    final firstDayOfMonth = DateTime(
-      _currentMonth.year,
-      _currentMonth.month,
-      1,
+    final int daysInMonth = DateUtils.getDaysInMonth(
+      _focusedMonth.year,
+      _focusedMonth.month,
     );
-    final lastDayOfMonth = DateTime(
-      _currentMonth.year,
-      _currentMonth.month + 1,
-      0,
-    );
-    final daysInMonth = lastDayOfMonth.day;
-    final firstWeekday = firstDayOfMonth.weekday % 7;
+    final int firstWeekday =
+        DateTime(_focusedMonth.year, _focusedMonth.month, 1).weekday % 7;
+    final DateTime today = DateTime.now();
 
-    final List<Widget> dayWidgets = [];
-
-    // Add empty spaces for days before month starts
-    for (int i = 0; i < firstWeekday; i++) {
-      dayWidgets.add(const SizedBox());
-    }
-
-    // Add day numbers
-    for (int day = 1; day <= daysInMonth; day++) {
-      final date = DateTime(_currentMonth.year, _currentMonth.month, day);
-      final hasMood = _hasMoodData(date);
-      final isToday = _isToday(date);
-
-      dayWidgets.add(_buildDayCell(day, hasMood, isToday));
-    }
-
-    return GridView.count(
+    return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 7,
-      mainAxisSpacing: 8,
-      crossAxisSpacing: 8,
-      children: dayWidgets,
+      itemCount: daysInMonth + firstWeekday,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 7,
+        mainAxisSpacing: 8,
+        crossAxisSpacing: 8,
+      ),
+      itemBuilder: (context, index) {
+        if (index < firstWeekday) return const SizedBox.shrink();
+
+        final int dayNumber = index - firstWeekday + 1;
+        final DateTime date = DateTime(
+          _focusedMonth.year,
+          _focusedMonth.month,
+          dayNumber,
+        );
+
+        // Kiểm tra logic bằng Set.any để đạt hiệu năng O(n) hoặc chuyển sang dùng format string để check O(1)
+        final bool hasMood = widget.moodDates.any((d) => _isSameDay(d, date));
+        final bool isToday = _isSameDay(date, today);
+
+        return _CalendarDayTile(
+          day: dayNumber,
+          hasMood: hasMood,
+          isToday: isToday,
+        );
+      },
     );
   }
+}
 
-  Widget _buildDayCell(int day, bool hasMood, bool isToday) {
+// --- Sub-widgets để code gọn hơn ---
+
+class _MonthNavButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onPressed;
+
+  const _MonthNavButton({required this.icon, required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 24),
+      color: Colors.white.withOpacity(0.7),
+      visualDensity: VisualDensity.compact,
+    );
+  }
+}
+
+class _CalendarDayTile extends StatelessWidget {
+  final int day;
+  final bool hasMood;
+  final bool isToday;
+
+  const _CalendarDayTile({
+    required this.day,
+    required this.hasMood,
+    required this.isToday,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final Color bgColor = hasMood
+        ? AppColors.primaryGreen.withOpacity(0.2)
+        : Colors.grey.withOpacity(0.3);
+    final Color textColor = hasMood
+        ? AppColors.primaryGreen
+        : Colors.white.withOpacity(0.3);
+
     return Container(
       decoration: BoxDecoration(
-        color: hasMood
-            ? const Color(0xFF7CB342).withOpacity(0.2)
-            : const Color(0xFF2D3748),
-        // shape: BoxShape.circle,
+        color: bgColor,
         borderRadius: BorderRadius.circular(8),
-        border: isToday
-            ? Border.all(color: const Color(0xFF7CB342), width: 2)
-            : null,
+        border: isToday ? Border.all(color: Colors.green, width: 2) : null,
       ),
       child: Center(
         child: Text(
-          day.toString(),
+          '$day',
           style: TextStyle(
-            color: hasMood
-                ? const Color(0xFF7CB342)
-                : Colors.white.withOpacity(0.5),
-            fontSize: 14,
+            color: textColor,
+            fontSize: 12,
             fontWeight: hasMood ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
       ),
     );
-  }
-
-  bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
   }
 }

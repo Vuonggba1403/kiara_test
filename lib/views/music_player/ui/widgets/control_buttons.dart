@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 /// Music player control buttons (previous, play/pause, next)
 class MusicControlButtons extends StatelessWidget {
@@ -38,13 +39,13 @@ class MusicControlButtons extends StatelessWidget {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: const LinearGradient(
-                colors: [Color(0xFF8BC34A), Color(0xFF7CB342)],
+                colors: [AppColors.lightGreen, AppColors.primaryGreen],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF7CB342).withOpacity(0.4),
+                  color: AppColors.primaryGreen.withOpacity(0.4),
                   blurRadius: 20,
                   offset: const Offset(0, 8),
                 ),

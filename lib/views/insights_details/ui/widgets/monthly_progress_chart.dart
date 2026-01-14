@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:kiara_app_test/views/insights_details/logic/cubit/insight_details_cubit.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
+import 'package:kiara_app_test/core/models/wellbeing_models.dart';
 
 class MonthlyProgressChart extends StatelessWidget {
   final List<WeekProgress> data;
@@ -12,28 +13,35 @@ class MonthlyProgressChart extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+        border: Border.all(
+          color: AppColors.textColor.withOpacity(0.1),
+          width: 1,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ================= HEADER =================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
                 'Monthly Progress',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Icon(Icons.trending_up, color: const Color(0xFF7CB342), size: 24),
+              Icon(Icons.trending_up, color: AppColors.primaryGreen, size: 24),
             ],
           ),
+
           const SizedBox(height: 24),
+
+          // ================= BAR CHART =================
           SizedBox(
             height: 200,
             child: BarChart(
@@ -43,6 +51,8 @@ class MonthlyProgressChart extends StatelessWidget {
                 barTouchData: BarTouchData(enabled: false),
                 titlesData: FlTitlesData(
                   show: true,
+
+                  // -------- Bottom (Weeks) --------
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -53,17 +63,19 @@ class MonthlyProgressChart extends StatelessWidget {
                             child: Text(
                               data[value.toInt()].week,
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.4),
+                                color: AppColors.textColor.withOpacity(0.4),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
                           );
                         }
-                        return const Text('');
+                        return const SizedBox.shrink();
                       },
                     ),
                   ),
+
+                  // -------- Left (Values) --------
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -73,13 +85,14 @@ class MonthlyProgressChart extends StatelessWidget {
                         return Text(
                           value.toInt().toString(),
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.4),
+                            color: AppColors.textColor.withOpacity(0.4),
                             fontSize: 12,
                           ),
                         );
                       },
                     ),
                   ),
+
                   rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
@@ -87,18 +100,23 @@ class MonthlyProgressChart extends StatelessWidget {
                     sideTitles: SideTitles(showTitles: false),
                   ),
                 ),
+
+                // -------- Grid --------
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
                   horizontalInterval: 25,
                   getDrawingHorizontalLine: (value) {
                     return FlLine(
-                      color: Colors.white.withOpacity(0.05),
+                      color: AppColors.textColor.withOpacity(0.05),
                       strokeWidth: 1,
                     );
                   },
                 ),
+
                 borderData: FlBorderData(show: false),
+
+                // -------- Bars --------
                 barGroups: data.asMap().entries.map((entry) {
                   return BarChartGroupData(
                     x: entry.key,
@@ -106,9 +124,9 @@ class MonthlyProgressChart extends StatelessWidget {
                       BarChartRodData(
                         toY: entry.value.value.toDouble(),
                         gradient: const LinearGradient(
-                          colors: [Color(0xFF7CB342), Color(0xFF9CCC65)],
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
+                          colors: [AppColors.primaryGreen, Color(0xFF9CCC65)],
                         ),
                         width: 50,
                         borderRadius: const BorderRadius.vertical(

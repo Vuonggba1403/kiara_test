@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 import 'package:kiara_app_test/views/insights/logic/cubit/insights_cubit.dart';
 
 class MoodTrendsChart extends StatefulWidget {
@@ -35,7 +36,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
       ),
     );
 
-    Future.delayed(const Duration(milliseconds: 200), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         _animationController.forward();
       }
@@ -50,51 +51,82 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
 
   List<FlSpot> _getAnimatedSpots() {
     final List<FlSpot> spots = [];
+    final lineAnimationEnd = 0.6; // Line draws until 60% of animation
 
     for (int i = 0; i < widget.moodData.length; i++) {
       final targetY = widget.moodData[i].value;
-
-      // Calculate when this point should appear (left to right)
       final pointProgress = (widget.moodData.length - 1) == 0
           ? 1.0
           : i / (widget.moodData.length - 1);
 
-      // Point appears when animation reaches its position with smoother timing
-      final progressThreshold = pointProgress * 0.8;
+      // Line drawing phase (0 to lineAnimationEnd)
+      final lineProgressThreshold = pointProgress * lineAnimationEnd;
 
-      if (_animation.value >= progressThreshold) {
-        // Calculate how long this point has been visible
-        final visibleDuration = _animation.value - progressThreshold;
-        final animationDuration = 0.2 + (0.8 / widget.moodData.length);
+      if (_animation.value >= lineProgressThreshold) {
+        final visibleDuration = (_animation.value - lineProgressThreshold)
+            .clamp(0.0, lineAnimationEnd);
+        final localProgress =
+            (visibleDuration / (lineAnimationEnd / widget.moodData.length))
+                .clamp(0.0, 1.0);
 
-        // Clamp progress between 0 and 1
-        final localProgress = (visibleDuration / animationDuration).clamp(
-          0.0,
-          1.0,
-        );
+        final easedProgress = Curves.easeInOutCubic.transform(localProgress);
 
-        // Apply smoother easing
-        final easedProgress = Curves.easeInOutQuart.transform(localProgress);
-
-        // Interpolate Y value
         double animatedY;
         if (i == 0) {
-          // First point animates from 0 to target
           animatedY = targetY * easedProgress;
         } else {
-          // Subsequent points animate from previous value to target
           final previousY = widget.moodData[i - 1].value;
           animatedY = previousY + (targetY - previousY) * easedProgress;
         }
 
         spots.add(FlSpot(i.toDouble(), animatedY));
       } else {
-        // Point hasn't appeared yet - don't add it
         break;
       }
     }
 
     return spots;
+  }
+
+  bool _shouldShowDot(int index) {
+    final dotAnimationStart = 0.6;
+    final dotAnimationEnd = 1.0;
+
+    // Dots only appear after line is complete
+    if (_animation.value < dotAnimationStart) return false;
+
+    final dotAnimationProgress =
+        (_animation.value - dotAnimationStart) /
+        (dotAnimationEnd - dotAnimationStart);
+
+    final dotCount = widget.moodData.length;
+    final dotProgressThreshold = index / dotCount;
+
+    return dotAnimationProgress >= dotProgressThreshold;
+  }
+
+  double _getDotScale(int index) {
+    final dotAnimationStart = 0.6;
+    final dotAnimationEnd = 1.0;
+
+    if (_animation.value < dotAnimationStart) return 0.0;
+
+    final dotAnimationProgress =
+        (_animation.value - dotAnimationStart) /
+        (dotAnimationEnd - dotAnimationStart);
+
+    final dotCount = widget.moodData.length;
+    final dotProgressThreshold = index / dotCount;
+    final nextDotThreshold = (index + 1) / dotCount;
+
+    if (dotAnimationProgress < dotProgressThreshold) return 0.0;
+    if (dotAnimationProgress >= nextDotThreshold) return 1.0;
+
+    final localProgress =
+        (dotAnimationProgress - dotProgressThreshold) /
+        (nextDotThreshold - dotProgressThreshold);
+
+    return Curves.easeOutBack.transform(localProgress);
   }
 
   Offset? _calculateTooltipPosition() {
@@ -126,7 +158,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.scaffoldDark.withOpacity(0.2),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
       ),
@@ -136,19 +168,21 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Mood Trends',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.textColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  height: 27 / 18,
                 ),
               ),
               Text(
                 'This Week',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 13,
+                  color: AppColors.text2Color,
+                  fontSize: 12,
+                  height: 16 / 12,
                 ),
               ),
             ],
@@ -174,7 +208,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                           horizontalInterval: 1,
                           getDrawingHorizontalLine: (value) {
                             return FlLine(
-                              color: Colors.white.withOpacity(0.05),
+                              color: AppColors.textColor.withOpacity(0.05),
                               strokeWidth: 1,
                             );
                           },
@@ -200,9 +234,9 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                                     child: Text(
                                       widget.moodData[value.toInt()].day,
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.4),
+                                        color: AppColors.text2Color,
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w500,
+                                        // fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   );
@@ -225,9 +259,9 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                                     child: Text(
                                       value.toInt().toString(),
                                       style: TextStyle(
-                                        color: Colors.white.withOpacity(0.4),
+                                        color: AppColors.text2Color,
                                         fontSize: 12,
-                                        fontWeight: FontWeight.w500,
+                                        // fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   );
@@ -247,9 +281,9 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                               ? [
                                   VerticalLine(
                                     x: _touchedX!,
-                                    color: const Color(
-                                      0xFF8BC34A,
-                                    ).withOpacity(0.5),
+                                    color: AppColors.lightGreen.withOpacity(
+                                      0.5,
+                                    ),
                                     strokeWidth: 2,
                                     dashArray: [5, 5],
                                   ),
@@ -262,21 +296,31 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                             isCurved: true,
                             curveSmoothness: 0.4,
                             preventCurveOverShooting: true,
-                            color: const Color(0xFF8BC34A),
+                            color: AppColors.lightGreen,
                             barWidth: 3,
                             isStrokeCapRound: true,
                             dotData: FlDotData(
-                              show:
-                                  _animationController.status ==
-                                  AnimationStatus.completed,
+                              show: true,
                               getDotPainter: (spot, percent, barData, index) {
+                                if (!_shouldShowDot(index)) {
+                                  return FlDotCirclePainter(
+                                    radius: 0,
+                                    color: Colors.transparent,
+                                    strokeWidth: 0,
+                                    strokeColor: Colors.transparent,
+                                  );
+                                }
+
                                 final isTouched = _touchedIndex == index;
+                                final scale = _getDotScale(index);
+                                final radius = (isTouched ? 8.0 : 5.0) * scale;
+
                                 return FlDotCirclePainter(
-                                  radius: isTouched ? 8 : 5,
+                                  radius: radius,
                                   color: isTouched
-                                      ? const Color(0xFF8BC34A)
-                                      : Colors.transparent,
-                                  strokeWidth: 3,
+                                      ? AppColors.primaryGreen
+                                      : AppColors.textColor.withOpacity(0.2),
+                                  strokeWidth: 3 * scale,
                                   strokeColor: Colors.white,
                                 );
                               },
@@ -285,8 +329,8 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                               show: true,
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(0xFF8BC34A).withOpacity(0.2),
-                                  const Color(0xFF8BC34A).withOpacity(0.0),
+                                  AppColors.primaryGreen.withOpacity(0.2),
+                                  AppColors.primaryGreen.withOpacity(0.0),
                                 ],
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
@@ -345,7 +389,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                                           (spot, percent, barData, index) {
                                             return FlDotCirclePainter(
                                               radius: 8,
-                                              color: const Color(0xFF8BC34A),
+                                              color: AppColors.lightGreen,
                                               strokeWidth: 3,
                                               strokeColor: Colors.white,
                                             );
@@ -384,12 +428,10 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                                 vertical: 10,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF1E293B),
+                                color: AppColors.scaffoldDark,
                                 borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: const Color(
-                                    0xFF8BC34A,
-                                  ).withOpacity(0.2),
+                                  color: AppColors.lightGreen.withOpacity(0.2),
                                   width: 1,
                                 ),
                                 boxShadow: [
@@ -416,7 +458,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                                   Text(
                                     'mood: ${_touchedY?.toStringAsFixed(1) ?? "0"}',
                                     style: const TextStyle(
-                                      color: Color(0xFF8BC34A),
+                                      color: AppColors.lightGreen,
                                       fontSize: 12,
                                       fontWeight: FontWeight.w500,
                                     ),

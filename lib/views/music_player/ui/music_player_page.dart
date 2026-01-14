@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kiara_app_test/core/functions/app_background.dart';
 import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
 import 'package:kiara_app_test/core/models/song_model.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/album_art.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/control_buttons.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/progress_bar.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/volume_slider.dart';
-import 'package:kiara_app_test/views/music_player/ui/widgets/playlist_bottom_sheet.dart';
+import 'package:kiara_app_test/views/music_player/ui/widgets/playlist_bottom_sheet.dart'
+    show showPlaylistBottomSheet;
 
 class MusicPlayerPage extends StatelessWidget {
   final SongModel song;
@@ -18,8 +20,22 @@ class MusicPlayerPage extends StatelessWidget {
     return BlocBuilder<GlobalMusicPlayerCubit, GlobalMusicPlayerState>(
       builder: (context, globalState) {
         return Scaffold(
-          backgroundColor: const Color(0xFF1A1F3A),
-          body: SafeArea(child: _buildBody(context, globalState)),
+          body: AppBackground(
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
+                      child: _buildBody(context, globalState),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
         );
       },
     );
@@ -28,44 +44,53 @@ class MusicPlayerPage extends StatelessWidget {
   Widget _buildBody(BuildContext context, GlobalMusicPlayerState globalState) {
     final globalCubit = context.read<GlobalMusicPlayerCubit>();
 
+    // Get current song from global state, fallback to passed song
+    SongModel currentSong = song;
+    if (globalState is GlobalMusicPlayerPlaying) {
+      currentSong = globalState.currentSong;
+    } else if (globalState is GlobalMusicPlayerPaused) {
+      currentSong = globalState.currentSong;
+    }
+
     // Sync with global state
     final isPlaying =
         globalState is GlobalMusicPlayerPlaying &&
-        globalState.currentSong.id == song.id;
+        globalState.currentSong.id == currentSong.id;
 
     final currentPosition =
         (globalState is GlobalMusicPlayerPlaying &&
-            globalState.currentSong.id == song.id)
+            globalState.currentSong.id == currentSong.id)
         ? globalState.currentPosition
         : (globalState is GlobalMusicPlayerPaused &&
-              globalState.currentSong.id == song.id)
+              globalState.currentSong.id == currentSong.id)
         ? globalState.currentPosition
         : Duration.zero;
 
     final totalDuration =
         (globalState is GlobalMusicPlayerPlaying &&
-            globalState.currentSong.id == song.id)
+            globalState.currentSong.id == currentSong.id)
         ? globalState.currentSong.duration
         : (globalState is GlobalMusicPlayerPaused &&
-              globalState.currentSong.id == song.id)
+              globalState.currentSong.id == currentSong.id)
         ? globalState.currentSong.duration
-        : song.duration;
+        : currentSong.duration;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         // App bar
-        _buildAppBar(context, globalCubit),
-        const Spacer(flex: 2),
+        _buildAppBar(context, globalCubit, currentSong),
+        const SizedBox(height: 24),
 
         // Album art with continuous ripple effect
-        AlbumArt(imageUrl: song.albumArt, isPlaying: isPlaying),
+        AlbumArt(imageUrl: currentSong.albumArt, isPlaying: isPlaying),
 
-        const Spacer(flex: 2),
+        const SizedBox(height: 24),
 
         // Song info
-        _buildSongInfo(),
+        _buildSongInfo(currentSong),
 
-        const Spacer(),
+        const SizedBox(height: 24),
 
         // Progress bar
         Padding(
@@ -86,13 +111,13 @@ class MusicPlayerPage extends StatelessWidget {
           isPlaying: isPlaying,
           onPlayPause: () {
             if (globalState is GlobalMusicPlayerPlaying &&
-                globalState.currentSong.id == song.id) {
+                globalState.currentSong.id == currentSong.id) {
               globalCubit.togglePlayPause();
             } else if (globalState is GlobalMusicPlayerPaused &&
-                globalState.currentSong.id == song.id) {
+                globalState.currentSong.id == currentSong.id) {
               globalCubit.togglePlayPause();
             } else {
-              globalCubit.playSong(song);
+              globalCubit.playSong(currentSong);
             }
           },
           onPrevious: () {},
@@ -112,6 +137,7 @@ class MusicPlayerPage extends StatelessWidget {
   Widget _buildAppBar(
     BuildContext context,
     GlobalMusicPlayerCubit globalCubit,
+    SongModel currentSong,
   ) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -119,11 +145,7 @@ class MusicPlayerPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            icon: const Icon(
-              Icons.keyboard_arrow_down,
-              size: 28,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.arrow_back, size: 28, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
           const Text(
@@ -141,9 +163,9 @@ class MusicPlayerPage extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
-              PlaylistBottomSheet.show(
+              showPlaylistBottomSheet(
                 context,
-                currentSong: song,
+                currentSong: currentSong,
                 onSongSelected: (selectedSong) {
                   globalCubit.playSong(selectedSong);
                   Navigator.pushReplacement(
@@ -161,13 +183,13 @@ class MusicPlayerPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSongInfo() {
+  Widget _buildSongInfo(SongModel currentSong) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0),
       child: Column(
         children: [
           Text(
-            song.title,
+            currentSong.title,
             style: const TextStyle(
               color: Colors.white,
               fontSize: 24,
@@ -179,7 +201,7 @@ class MusicPlayerPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            song.artist,
+            currentSong.artist,
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
               fontSize: 14,

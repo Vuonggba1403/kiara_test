@@ -1,0 +1,44 @@
+{
+  "playlist": [
+    {
+      "id": "deep_ocean_calm",
+      "title": "Deep Ocean Calm",
+      "artist": "432 Hz healing frequency",
+      "duration": "30:00",
+      "image": "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=300&h=300&fit=crop",
+      "audioUrl": ""
+    },
+    {
+      "id": "morning_focus",
+      "title": "Morning Focus",
+      "artist": "40 Hz gamma waves",
+      "duration": "20:00",
+      "image": "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=300&h=300&fit=crop",
+      "audioUrl": ""
+    },
+    {
+      "id": "night_serenity",
+      "title": "Night Serenity",
+      "artist": "528 Hz + Delta waves",
+      "duration": "45:00",
+      "image": "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=300&h=300&fit=crop",
+      "audioUrl": ""
+    },
+    {
+      "id": "chakra_balance",
+      "title": "Chakra Balance",
+      "artist": "7 chakra frequencies",
+      "duration": "25:00",
+      "image": "https://images.unsplash.com/photo-1545389336-cf090694435e?w=300&h=300&fit=crop",
+      "audioUrl": ""
+    },
+    {
+      "id": "forest_meditation",
+      "title": "Forest Meditation",
+      "artist": "417 Hz transformation",
+      "duration": "35:00",
+      "image": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=300&h=300&fit=crop",
+      "audioUrl": ""
+    }
+  ]
+}
