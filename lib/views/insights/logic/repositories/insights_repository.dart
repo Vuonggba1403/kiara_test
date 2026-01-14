@@ -5,7 +5,7 @@ class InsightsRepository {
   /// Fetches mood data for the week
   Future<List<MoodPoint>> getMoodData() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return [
       MoodPoint(day: 'Mon', value: 3.5),
@@ -21,7 +21,7 @@ class InsightsRepository {
   /// Fetches energy and stress data
   Future<List<EnergyStressPoint>> getEnergyStressData() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return [
       EnergyStressPoint(day: 'Mon', energy: 70, stress: 25),
@@ -37,7 +37,7 @@ class InsightsRepository {
   /// Fetches mood dates for calendar
   Future<Set<DateTime>> getMoodDates() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     final now = DateTime.now();
     return {
@@ -72,7 +72,7 @@ class InsightsRepository {
   /// Fetches AI-generated insight text
   Future<String> getAIInsight() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return 'Your mood has been trending upward this week! You seem to feel your best on Friday and Sunday. Consider what activities or habits are contributing to these positive days.';
   }

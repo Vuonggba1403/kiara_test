@@ -6,7 +6,7 @@ class InsightDetailsRepository {
   /// Fetches monthly progress data
   Future<List<WeekProgress>> getMonthlyProgress() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return [
       WeekProgress(week: 'W1', value: 65),
@@ -19,7 +19,7 @@ class InsightDetailsRepository {
   /// Fetches wellbeing profile data
   Future<WellbeingProfile> getWellbeingProfile() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return WellbeingProfile(
       mood: 85,
@@ -34,7 +34,7 @@ class InsightDetailsRepository {
   /// Fetches recommended albums
   Future<List<RecommendedAlbum>> getRecommendedAlbums() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return [
       RecommendedAlbum(
@@ -64,7 +64,7 @@ class InsightDetailsRepository {
   /// Fetches personalized insights
   Future<List<PersonalizedInsight>> getPersonalizedInsights() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return [
       PersonalizedInsight(
@@ -94,7 +94,7 @@ class InsightDetailsRepository {
   /// Fetches overall wellbeing summary
   Future<Map<String, dynamic>> getOverallWellbeingSummary() async {
     // Simulate API call
-    await Future.delayed(const Duration(milliseconds: 150));
+    await Future.delayed(const Duration(milliseconds: 50));
 
     return {
       'overallWellbeing': 85,

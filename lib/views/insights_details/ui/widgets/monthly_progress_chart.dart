@@ -3,10 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 import 'package:kiara_app_test/core/models/wellbeing_models.dart';
 
-class MonthlyProgressChart extends StatelessWidget {
+class MonthlyProgressChart extends StatefulWidget {
   final List<WeekProgress> data;
 
   const MonthlyProgressChart({super.key, required this.data});
+
+  @override
+  State<MonthlyProgressChart> createState() => _MonthlyProgressChartState();
+}
+
+class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
+  int? _touchedIndex;
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +55,42 @@ class MonthlyProgressChart extends StatelessWidget {
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
                 maxY: 100,
-                barTouchData: BarTouchData(enabled: false),
+                barTouchData: BarTouchData(
+                  enabled: true,
+                  touchCallback: (FlTouchEvent event, barTouchResponse) {
+                    setState(() {
+                      if (!event.isInterestedForInteractions ||
+                          barTouchResponse == null ||
+                          barTouchResponse.spot == null) {
+                        _touchedIndex = null;
+                        return;
+                      }
+                      _touchedIndex =
+                          barTouchResponse.spot!.touchedBarGroupIndex;
+                    });
+                  },
+                  touchTooltipData: BarTouchTooltipData(
+                    getTooltipColor: (_) => const Color(0xFF2D2F3E),
+                    tooltipPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    tooltipMargin: 8,
+                    tooltipBorder: const BorderSide(color: Color(0xFF2D2F3E)),
+                    fitInsideHorizontally: true,
+                    fitInsideVertically: true,
+                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                      return BarTooltipItem(
+                        '${rod.toY.toInt()}%',
+                        const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      );
+                    },
+                  ),
+                ),
                 titlesData: FlTitlesData(
                   show: true,
 
@@ -57,11 +99,12 @@ class MonthlyProgressChart extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        if (value.toInt() >= 0 && value.toInt() < data.length) {
+                        if (value.toInt() >= 0 &&
+                            value.toInt() < widget.data.length) {
                           return Padding(
                             padding: const EdgeInsets.only(top: 8),
                             child: Text(
-                              data[value.toInt()].week,
+                              widget.data[value.toInt()].week,
                               style: TextStyle(
                                 color: AppColors.textColor.withOpacity(0.4),
                                 fontSize: 14,
@@ -117,18 +160,27 @@ class MonthlyProgressChart extends StatelessWidget {
                 borderData: FlBorderData(show: false),
 
                 // -------- Bars --------
-                barGroups: data.asMap().entries.map((entry) {
+                barGroups: widget.data.asMap().entries.map((entry) {
+                  final isTouched = entry.key == _touchedIndex;
                   return BarChartGroupData(
                     x: entry.key,
                     barRods: [
                       BarChartRodData(
                         toY: entry.value.value.toDouble(),
-                        gradient: const LinearGradient(
+                        gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
-                          colors: [AppColors.primaryGreen, Color(0xFF9CCC65)],
+                          colors: isTouched
+                              ? [
+                                  AppColors.primaryGreen.withOpacity(0.8),
+                                  const Color(0xFF9CCC65).withOpacity(0.8),
+                                ]
+                              : [
+                                  AppColors.primaryGreen,
+                                  const Color(0xFF9CCC65),
+                                ],
                         ),
-                        width: 50,
+                        width: isTouched ? 55 : 50,
                         borderRadius: const BorderRadius.vertical(
                           top: Radius.circular(8),
                         ),

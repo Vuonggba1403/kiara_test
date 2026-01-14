@@ -34,24 +34,27 @@ class RecommendedMusicSection extends StatelessWidget {
   }
 
   Widget _buildHeader() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        const Text(
-          'Recommended for You',
-          style: TextStyle(
-            color: AppColors.textColor,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Text(
+            'Recommended for You',
+            style: TextStyle(
+              color: AppColors.textColor,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        Image.asset(
-          'assets/image/sounds.png',
-          width: 22,
-          height: 22,
-          color: AppColors.primaryGreen,
-        ),
-      ],
+          Image.asset(
+            'assets/image/sounds.png',
+            width: 22,
+            height: 22,
+            color: AppColors.primaryGreen,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -81,6 +84,20 @@ class _RecommendedAlbumCard extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: _cardGradient(album.color),
               borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: album.color.withOpacity(0.2),
+                  blurRadius: 12,
+                  spreadRadius: 0,
+                  offset: const Offset(0, 4),
+                ),
+                BoxShadow(
+                  color: Colors.white.withOpacity(0.05),
+                  blurRadius: 8,
+                  spreadRadius: -2,
+                  offset: const Offset(0, -2),
+                ),
+              ],
             ),
             child: Row(
               children: [

@@ -26,7 +26,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 3000),
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(
@@ -36,7 +36,8 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
       ),
     );
 
-    Future.delayed(const Duration(seconds: 2), () {
+    // Start animation immediately
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _animationController.forward();
       }
@@ -294,8 +295,8 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
                           LineChartBarData(
                             spots: animatedSpots,
                             isCurved: true,
-                            curveSmoothness: 0.4,
-                            preventCurveOverShooting: true,
+                            curveSmoothness: 0.5,
+                            preventCurveOverShooting: false,
                             color: AppColors.lightGreen,
                             barWidth: 3,
                             isStrokeCapRound: true,

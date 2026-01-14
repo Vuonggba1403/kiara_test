@@ -9,13 +9,11 @@ class InsightsCubit extends Cubit<InsightsState> {
 
   InsightsCubit({InsightsRepository? repository})
     : _repository = repository ?? InsightsRepository(),
-      super(InsightsInitial()) {
+      super(InsightsLoading()) {
     loadInsights();
   }
 
   Future<void> loadInsights() async {
-    emit(InsightsLoading());
-
     try {
       // Fetch all data from repository
       final results = await Future.wait([

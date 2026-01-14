@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
 import 'package:kiara_app_test/views/main_tab/ui/main_tab_view.dart';
+import 'package:kiara_app_test/core/functions/color_extension.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,21 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         home: const MainTabView(),
-        theme: ThemeData(fontFamily: 'Arimo'),
+        theme: ThemeData(
+          fontFamily: 'Arimo',
+          scaffoldBackgroundColor: AppColors.scaffoldDeeper,
+          canvasColor: AppColors.scaffoldDeeper,
+          colorScheme: ColorScheme.dark(
+            surface: AppColors.scaffoldDeeper,
+            background: AppColors.scaffoldDeeper,
+          ),
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+            },
+          ),
+        ),
       ),
     );
   }

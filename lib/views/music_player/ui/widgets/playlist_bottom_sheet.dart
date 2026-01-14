@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kiara_app_test/core/models/song_model.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 import 'package:kiara_app_test/core/services/playlist_service.dart';
+import 'package:kiara_app_test/core/functions/animated_list_view.dart';
 
 /// Bottom sheet displaying playlist of songs
 class PlaylistBottomSheet extends StatefulWidget {
@@ -105,15 +106,7 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
           : PlaylistService.loadPlaylist(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.cardDark,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-            ),
-            child: const Center(
-              child: CircularProgressIndicator(color: AppColors.primaryGreen),
-            ),
-          );
+          return _buildLoadingSkeleton(context);
         }
 
         final playlist = snapshot.data!;
@@ -416,6 +409,113 @@ void showPlaylistBottomSheet(
       currentSong: currentSong,
       playlist: playlist,
       onSongSelected: onSongSelected,
+    ),
+  );
+}
+
+Widget _buildLoadingSkeleton(BuildContext context) {
+  return Container(
+    decoration: const BoxDecoration(
+      color: AppColors.cardDark,
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    child: Column(
+      children: [
+        // Header
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 100,
+                height: 28,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        // Loading items
+        Expanded(
+          child: AnimatedListBuilder(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: 6,
+            itemBuilder: (context, index) => _buildSkeletonItem(),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+Widget _buildSkeletonItem() {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 12),
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Colors.white.withOpacity(0.05),
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        // Album art skeleton
+        Container(
+          width: 48,
+          height: 48,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Text skeleton
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: double.infinity,
+                height: 16,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                width: 150,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Icon skeleton
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ],
     ),
   );
 }

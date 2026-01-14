@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiara_app_test/core/functions/app_background.dart';
 import 'package:kiara_app_test/core/functions/insights_app_bar.dart';
+import 'package:kiara_app_test/core/functions/animated_list_view.dart';
 import 'package:kiara_app_test/views/insights_details/logic/cubit/insight_details_cubit.dart';
 import 'package:kiara_app_test/views/insights_details/ui/widgets/monthly_progress_chart.dart';
 import 'package:kiara_app_test/views/insights_details/ui/widgets/overall_wellbeing_card.dart';
@@ -29,17 +30,13 @@ class _InsightDetailsPageState extends State<InsightDetailsPage> {
     return BlocProvider(
       create: (_) => InsightDetailsCubit(),
       child: Scaffold(
-        backgroundColor: AppColors.scaffoldDeeper,
+        backgroundColor: Colors.transparent,
         body: AppBackground(
           child: SafeArea(
             child: BlocBuilder<InsightDetailsCubit, InsightDetailsState>(
               builder: (context, state) {
                 if (state is InsightDetailsLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: AppColors.primaryGreen,
-                    ),
-                  );
+                  return _buildLoadingSkeleton();
                 }
 
                 if (state is InsightDetailsLoaded) {
@@ -58,7 +55,7 @@ class _InsightDetailsPageState extends State<InsightDetailsPage> {
   Widget _buildContent(BuildContext context, InsightDetailsLoaded state) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
-      child: Column(
+      child: AnimatedColumn(
         children: [
           InsightsAppBar(
             title: "Insights",
@@ -104,7 +101,7 @@ class _InsightDetailsPageState extends State<InsightDetailsPage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton.icon(
-        onPressed: () => _showPlaylist(context),
+        onPressed: () => _navigateToSoundsPage(context),
         label: const Text(
           'Browse All Albums',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
@@ -122,32 +119,95 @@ class _InsightDetailsPageState extends State<InsightDetailsPage> {
     );
   }
 
-  Future<void> _showPlaylist(BuildContext context) async {
-    final playlist = await PlaylistService.loadPlaylist();
-    final globalCubit = context.read<GlobalMusicPlayerCubit>();
-    final globalState = globalCubit.state;
+  void _navigateToSoundsPage(BuildContext context) {
+    // Pop back to main tab and navigate to Sounds page (index 3)
+    Navigator.pop(context);
+    // The main tab will handle the navigation to index 3
+  }
 
-    // Get currently playing song from global state
-    SongModel? currentSong;
-    if (globalState is GlobalMusicPlayerPlaying) {
-      currentSong = globalState.currentSong;
-    } else if (globalState is GlobalMusicPlayerPaused) {
-      currentSong = globalState.currentSong;
-    }
+  Widget _buildLoadingSkeleton() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: AnimatedColumn(
+        children: [
+          const SizedBox(height: 60),
+          _buildSkeletonCard(height: 180),
+          const SizedBox(height: 24),
+          _buildSkeletonCard(height: 200),
+          const SizedBox(height: 24),
+          _buildSkeletonCard(height: 150),
+          const SizedBox(height: 32),
+          _buildSkeletonCard(height: 200),
+          const SizedBox(height: 32),
+          _buildSkeletonCard(height: 250),
+        ],
+      ),
+    );
+  }
 
-    if (context.mounted) {
-      showPlaylistBottomSheet(
-        context,
-        playlist: playlist,
-        currentSong: currentSong,
-        onSongSelected: (song) {
-          globalCubit.playSong(song);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => MusicPlayerPage(song: song)),
-          );
-        },
-      );
-    }
+  Widget _buildSkeletonCard({required double height}) {
+    return Container(
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: _ShimmerEffect(),
+      ),
+    );
+  }
+}
+
+class _ShimmerEffect extends StatefulWidget {
+  @override
+  State<_ShimmerEffect> createState() => _ShimmerEffectState();
+}
+
+class _ShimmerEffectState extends State<_ShimmerEffect>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withOpacity(0.0),
+                Colors.white.withOpacity(0.05),
+                Colors.white.withOpacity(0.0),
+              ],
+              stops: [
+                _controller.value - 0.3,
+                _controller.value,
+                _controller.value + 0.3,
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 }
