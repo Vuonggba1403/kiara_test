@@ -14,6 +14,18 @@ class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
 
   SongModel? get currentSong => _currentSong;
 
+  /// Load bài hát mà không tự động phát (paused state)
+  void loadSong(SongModel song) {
+    _currentSong = song;
+    _stopProgressTimer();
+    emit(
+      GlobalMusicPlayerPaused(
+        currentSong: song,
+        currentPosition: Duration.zero,
+      ),
+    );
+  }
+
   /// Starts playing a song
   void playSong(SongModel song) {
     _currentSong = song;
