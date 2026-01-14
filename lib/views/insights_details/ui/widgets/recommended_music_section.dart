@@ -4,7 +4,7 @@ import 'package:kiara_app_test/core/functions/color_extension.dart';
 import 'package:kiara_app_test/core/models/song_model.dart';
 import 'package:kiara_app_test/core/models/wellbeing_models.dart';
 import 'package:kiara_app_test/core/services/playlist_service.dart';
-import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
+import 'package:kiara_app_test/views/music_player/logic/cubit/global_music_player_cubit.dart';
 
 class RecommendedMusicSection extends StatelessWidget {
   final List<RecommendedAlbum> recommendations;

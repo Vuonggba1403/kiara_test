@@ -10,6 +10,21 @@ import 'package:kiara_app_test/views/insights/ui/widgets/mood_calendar.dart';
 import 'package:kiara_app_test/views/insights/ui/widgets/mood_trends_chart.dart';
 import 'package:kiara_app_test/views/insights/ui/widgets/stats_cards.dart';
 
+class _LayoutConfig {
+  static const double horizontalPadding = 20;
+  static const double spacing = 24;
+  static const double bottomSpacing = 20;
+
+  static const Duration scrollDuration = Duration(milliseconds: 600);
+  static const Curve scrollCurve = Curves.easeInOutCubic;
+
+  static const double skeletonCard1Height = 120;
+  static const double skeletonCard2Height = 250;
+  static const double skeletonCard3Height = 200;
+}
+
+/// Trang hiển thị insights và lịch sử mood
+/// Bao gồm: AI insight, mood trends, energy/stress chart, stats, calendar
 class InsightsPage extends StatefulWidget {
   const InsightsPage({super.key});
 
@@ -18,8 +33,14 @@ class InsightsPage extends StatefulWidget {
 }
 
 class _InsightsPageState extends State<InsightsPage> {
-  final _scrollController = ScrollController();
+  late final ScrollController _scrollController;
   final _calendarKey = GlobalKey();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
 
   @override
   void dispose() {
@@ -33,8 +54,8 @@ class _InsightsPageState extends State<InsightsPage> {
         final maxScroll = _scrollController.position.maxScrollExtent;
         _scrollController.animateTo(
           maxScroll,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOutCubic,
+          duration: _LayoutConfig.scrollDuration,
+          curve: _LayoutConfig.scrollCurve,
         );
       }
     });
@@ -55,43 +76,9 @@ class _InsightsPageState extends State<InsightsPage> {
                 }
 
                 if (state is InsightsLoaded) {
-                  return AnimatedListView(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    children: [
-                      InsightsAppBar(
-                        title: "Mood History",
-                        actionIconPath: 'assets/image/calendar.png',
-                        onActionTap: _scrollToCalendar,
-                      ),
-
-                      AIInsightCard(insight: state.aiInsight),
-                      const SizedBox(height: 24),
-
-                      MoodTrendsChart(moodData: state.moodData),
-                      const SizedBox(height: 24),
-
-                      EnergyStressChart(data: state.energyStressData),
-                      const SizedBox(height: 24),
-
-                      StatsCards(
-                        avgMood: state.avgMood,
-                        avgEnergy: state.avgEnergy,
-                        avgStress: state.avgStress,
-                      ),
-                      const SizedBox(height: 24),
-
-                      Container(
-                        key: _calendarKey,
-                        child: MoodCalendar(moodDates: state.moodDates),
-                      ),
-
-                      const SizedBox(height: 20),
-                    ],
-                  );
+                  return _buildContent(state);
                 }
 
-                // Fallback for error or other states
                 return const SizedBox.shrink();
               },
             ),
@@ -101,17 +88,64 @@ class _InsightsPageState extends State<InsightsPage> {
     );
   }
 
+  Widget _buildContent(InsightsLoaded state) {
+    return AnimatedListView(
+      controller: _scrollController,
+      padding: const EdgeInsets.symmetric(
+        horizontal: _LayoutConfig.horizontalPadding,
+      ),
+      children: [
+        _buildAppBar(),
+        AIInsightCard(insight: state.aiInsight),
+        const SizedBox(height: _LayoutConfig.spacing),
+        MoodTrendsChart(moodData: state.moodData),
+        const SizedBox(height: _LayoutConfig.spacing),
+        EnergyStressChart(data: state.energyStressData),
+        const SizedBox(height: _LayoutConfig.spacing),
+        _buildStatsCards(state),
+        const SizedBox(height: _LayoutConfig.spacing),
+        _buildCalendar(state),
+        const SizedBox(height: _LayoutConfig.bottomSpacing),
+      ],
+    );
+  }
+
+  Widget _buildAppBar() {
+    return InsightsAppBar(
+      title: "Mood History",
+      actionIconPath: 'assets/image/calendar.png',
+      onActionTap: _scrollToCalendar,
+    );
+  }
+
+  Widget _buildStatsCards(InsightsLoaded state) {
+    return StatsCards(
+      avgMood: state.avgMood,
+      avgEnergy: state.avgEnergy,
+      avgStress: state.avgStress,
+    );
+  }
+
+  Widget _buildCalendar(InsightsLoaded state) {
+    return Container(
+      key: _calendarKey,
+      child: MoodCalendar(moodDates: state.moodDates),
+    );
+  }
+
   Widget _buildLoadingSkeleton() {
     return AnimatedListView(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(
+        horizontal: _LayoutConfig.horizontalPadding,
+      ),
       children: [
         const SizedBox(height: 60),
-        _buildSkeletonCard(height: 120),
-        const SizedBox(height: 24),
-        _buildSkeletonCard(height: 250),
-        const SizedBox(height: 24),
-        _buildSkeletonCard(height: 250),
-        const SizedBox(height: 24),
+        _buildSkeletonCard(height: _LayoutConfig.skeletonCard1Height),
+        const SizedBox(height: _LayoutConfig.spacing),
+        _buildSkeletonCard(height: _LayoutConfig.skeletonCard2Height),
+        const SizedBox(height: _LayoutConfig.spacing),
+        _buildSkeletonCard(height: _LayoutConfig.skeletonCard3Height),
+        const SizedBox(height: _LayoutConfig.spacing),
         Row(
           children: [
             Expanded(child: _buildSkeletonCard(height: 100)),

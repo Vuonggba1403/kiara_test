@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 
-/// Music player control buttons (previous, play/pause, next)
 class MusicControlButtons extends StatelessWidget {
   final bool isPlaying;
   final VoidCallback onPlayPause;
@@ -21,7 +20,6 @@ class MusicControlButtons extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        // Previous button
         IconButton(
           icon: const Icon(Icons.skip_previous, color: Colors.white),
           iconSize: 40,

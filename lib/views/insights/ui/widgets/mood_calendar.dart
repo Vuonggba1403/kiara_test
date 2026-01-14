@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
-// Giả định AppColors được định nghĩa ở đây hoặc import từ file của bạn
-// import 'package:kiara_app_test/core/theme/app_colors.dart';
 
 class MoodCalendar extends StatefulWidget {
   final Set<DateTime> moodDates;
@@ -22,7 +20,6 @@ class _MoodCalendarState extends State<MoodCalendar> {
     _focusedMonth = DateTime.now();
   }
 
-  // --- Logic Helpers ---
   void _updateMonth(int offset) {
     setState(() {
       _focusedMonth = DateTime(
@@ -38,7 +35,6 @@ class _MoodCalendarState extends State<MoodCalendar> {
         date1.day == date2.day;
   }
 
-  // --- UI Components ---
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -139,7 +135,6 @@ class _MoodCalendarState extends State<MoodCalendar> {
           dayNumber,
         );
 
-        // Kiểm tra logic bằng Set.any để đạt hiệu năng O(n) hoặc chuyển sang dùng format string để check O(1)
         final bool hasMood = widget.moodDates.any((d) => _isSameDay(d, date));
         final bool isToday = _isSameDay(date, today);
 
@@ -152,8 +147,6 @@ class _MoodCalendarState extends State<MoodCalendar> {
     );
   }
 }
-
-// --- Sub-widgets để code gọn hơn ---
 
 class _MonthNavButton extends StatelessWidget {
   final IconData icon;

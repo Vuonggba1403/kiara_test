@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
+import 'package:kiara_app_test/views/music_player/logic/cubit/global_music_player_cubit.dart';
 import 'package:kiara_app_test/views/music_player/ui/music_player_page.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 
-/// Mini player that shows at bottom when music is playing
 class MiniPlayer extends StatelessWidget {
   const MiniPlayer({super.key});
 
@@ -32,7 +31,7 @@ class MiniPlayer extends StatelessWidget {
             );
           },
           child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
@@ -169,7 +168,7 @@ class MiniPlayer extends StatelessWidget {
     );
   }
 
-  /// Extract song from state
+  /// Trích xuất song từ state
   dynamic _extractSong(GlobalMusicPlayerState state) {
     if (state is GlobalMusicPlayerPlaying) {
       return state.currentSong;
@@ -179,7 +178,7 @@ class MiniPlayer extends StatelessWidget {
     throw Exception('Invalid state');
   }
 
-  /// Extract position from state
+  /// Trích xuất position từ state
   Duration _extractPosition(GlobalMusicPlayerState state) {
     if (state is GlobalMusicPlayerPlaying) {
       return state.currentPosition;

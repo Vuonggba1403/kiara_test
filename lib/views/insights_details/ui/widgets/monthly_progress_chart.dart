@@ -30,7 +30,6 @@ class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ================= HEADER =================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -48,7 +47,7 @@ class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
 
           const SizedBox(height: 24),
 
-          // ================= BAR CHART =================
+          // Bar Chart
           SizedBox(
             height: 200,
             child: BarChart(
@@ -94,7 +93,6 @@ class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
                 titlesData: FlTitlesData(
                   show: true,
 
-                  // -------- Bottom (Weeks) --------
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -118,7 +116,6 @@ class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
                     ),
                   ),
 
-                  // -------- Left (Values) --------
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
@@ -144,7 +141,6 @@ class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
                   ),
                 ),
 
-                // -------- Grid --------
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
@@ -159,7 +155,6 @@ class _MonthlyProgressChartState extends State<MonthlyProgressChart> {
 
                 borderData: FlBorderData(show: false),
 
-                // -------- Bars --------
                 barGroups: widget.data.asMap().entries.map((entry) {
                   final isTouched = entry.key == _touchedIndex;
                   return BarChartGroupData(

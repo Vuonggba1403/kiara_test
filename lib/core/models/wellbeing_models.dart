@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Represents weekly progress data
 class WeekProgress {
   final String week;
   final int value;
@@ -8,7 +7,6 @@ class WeekProgress {
   WeekProgress({required this.week, required this.value});
 }
 
-/// Represents wellbeing profile across different dimensions
 class WellbeingProfile {
   final int mood;
   final int energy;
@@ -27,7 +25,6 @@ class WellbeingProfile {
   });
 }
 
-/// Represents a recommended music album
 class RecommendedAlbum {
   final String title;
   final String category;
@@ -44,7 +41,6 @@ class RecommendedAlbum {
   });
 }
 
-/// Represents a personalized insight with recommendations
 class PersonalizedInsight {
   final String title;
   final String description;

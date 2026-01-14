@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 
-/// Displays the playback progress bar with time indicators
 class MusicProgressBar extends StatelessWidget {
   final Duration currentPosition;
   final Duration totalDuration;

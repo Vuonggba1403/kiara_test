@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kiara_app_test/core/functions/app_background.dart';
-import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
+import 'package:kiara_app_test/views/music_player/logic/cubit/global_music_player_cubit.dart';
 import 'package:kiara_app_test/core/models/song_model.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/album_art.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/control_buttons.dart';
@@ -10,6 +10,14 @@ import 'package:kiara_app_test/views/music_player/ui/widgets/volume_slider.dart'
 import 'package:kiara_app_test/views/music_player/ui/widgets/playlist_bottom_sheet.dart'
     show showPlaylistBottomSheet;
 
+class _LayoutConfig {
+  static const double horizontalPadding = 24;
+  static const double spacing = 24;
+  static const double largeSpacing = 32;
+}
+
+/// Trang phát nhạc chính
+/// Hiển thị: album art, song info, progress bar, control buttons
 class MusicPlayerPage extends StatelessWidget {
   final SongModel song;
 
@@ -44,94 +52,131 @@ class MusicPlayerPage extends StatelessWidget {
   Widget _buildBody(BuildContext context, GlobalMusicPlayerState globalState) {
     final globalCubit = context.read<GlobalMusicPlayerCubit>();
 
-    // Get current song from global state, fallback to passed song
-    SongModel currentSong = song;
-    if (globalState is GlobalMusicPlayerPlaying) {
-      currentSong = globalState.currentSong;
-    } else if (globalState is GlobalMusicPlayerPaused) {
-      currentSong = globalState.currentSong;
-    }
-
-    // Sync with global state
-    final isPlaying =
-        globalState is GlobalMusicPlayerPlaying &&
-        globalState.currentSong.id == currentSong.id;
-
-    final currentPosition =
-        (globalState is GlobalMusicPlayerPlaying &&
-            globalState.currentSong.id == currentSong.id)
-        ? globalState.currentPosition
-        : (globalState is GlobalMusicPlayerPaused &&
-              globalState.currentSong.id == currentSong.id)
-        ? globalState.currentPosition
-        : Duration.zero;
-
-    final totalDuration =
-        (globalState is GlobalMusicPlayerPlaying &&
-            globalState.currentSong.id == currentSong.id)
-        ? globalState.currentSong.duration
-        : (globalState is GlobalMusicPlayerPaused &&
-              globalState.currentSong.id == currentSong.id)
-        ? globalState.currentSong.duration
-        : currentSong.duration;
+    /// Lấy thông tin từ global state
+    final currentSong = _getCurrentSong(globalState);
+    final isPlaying = _isCurrentSongPlaying(globalState, currentSong);
+    final currentPosition = _getCurrentPosition(globalState, currentSong);
+    final totalDuration = _getTotalDuration(globalState, currentSong);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // App bar
         _buildAppBar(context, globalCubit, currentSong),
-        const SizedBox(height: 24),
-
-        // Album art with continuous ripple effect
+        const SizedBox(height: _LayoutConfig.spacing),
         AlbumArt(imageUrl: currentSong.albumArt, isPlaying: isPlaying),
-
-        const SizedBox(height: 24),
-
-        // Song info
+        const SizedBox(height: _LayoutConfig.spacing),
         _buildSongInfo(currentSong),
-
-        const SizedBox(height: 24),
-
-        // Progress bar
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: MusicProgressBar(
-            currentPosition: currentPosition,
-            totalDuration: totalDuration,
-            onSeek: (position) {
-              globalCubit.seekTo(position);
-            },
-          ),
-        ),
-
-        const SizedBox(height: 32),
-
-        // Control buttons
-        MusicControlButtons(
-          isPlaying: isPlaying,
-          onPlayPause: () {
-            if (globalState is GlobalMusicPlayerPlaying &&
-                globalState.currentSong.id == currentSong.id) {
-              globalCubit.togglePlayPause();
-            } else if (globalState is GlobalMusicPlayerPaused &&
-                globalState.currentSong.id == currentSong.id) {
-              globalCubit.togglePlayPause();
-            } else {
-              globalCubit.playSong(currentSong);
-            }
-          },
-          onPrevious: () {},
-          onNext: () {},
-        ),
-
-        const SizedBox(height: 24),
-
-        // Bottom controls
+        const SizedBox(height: _LayoutConfig.spacing),
+        _buildProgressBar(currentPosition, totalDuration, globalCubit),
+        const SizedBox(height: _LayoutConfig.largeSpacing),
+        _buildControlButtons(context, globalState, currentSong, isPlaying),
+        const SizedBox(height: _LayoutConfig.spacing),
         _buildBottomControls(),
-
-        const SizedBox(height: 32),
+        const SizedBox(height: _LayoutConfig.largeSpacing),
       ],
     );
+  }
+
+  SongModel _getCurrentSong(GlobalMusicPlayerState state) {
+    if (state is GlobalMusicPlayerPlaying) {
+      return state.currentSong;
+    } else if (state is GlobalMusicPlayerPaused) {
+      return state.currentSong;
+    }
+    return song;
+  }
+
+  bool _isCurrentSongPlaying(
+    GlobalMusicPlayerState state,
+    SongModel currentSong,
+  ) {
+    return state is GlobalMusicPlayerPlaying &&
+        state.currentSong.id == currentSong.id;
+  }
+
+  Duration _getCurrentPosition(
+    GlobalMusicPlayerState state,
+    SongModel currentSong,
+  ) {
+    if (state is GlobalMusicPlayerPlaying &&
+        state.currentSong.id == currentSong.id) {
+      return state.currentPosition;
+    } else if (state is GlobalMusicPlayerPaused &&
+        state.currentSong.id == currentSong.id) {
+      return state.currentPosition;
+    }
+    return Duration.zero;
+  }
+
+  Duration _getTotalDuration(
+    GlobalMusicPlayerState state,
+    SongModel currentSong,
+  ) {
+    if (state is GlobalMusicPlayerPlaying &&
+        state.currentSong.id == currentSong.id) {
+      return state.currentSong.duration;
+    } else if (state is GlobalMusicPlayerPaused &&
+        state.currentSong.id == currentSong.id) {
+      return state.currentSong.duration;
+    }
+    return currentSong.duration;
+  }
+
+  Widget _buildProgressBar(
+    Duration currentPosition,
+    Duration totalDuration,
+    GlobalMusicPlayerCubit cubit,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: _LayoutConfig.horizontalPadding,
+      ),
+      child: MusicProgressBar(
+        currentPosition: currentPosition,
+        totalDuration: totalDuration,
+        onSeek: (position) => cubit.seekTo(position),
+      ),
+    );
+  }
+
+  Widget _buildControlButtons(
+    BuildContext context,
+    GlobalMusicPlayerState globalState,
+    SongModel currentSong,
+    bool isPlaying,
+  ) {
+    final globalCubit = context.read<GlobalMusicPlayerCubit>();
+
+    return MusicControlButtons(
+      isPlaying: isPlaying,
+      onPlayPause: () =>
+          _handlePlayPause(globalState, currentSong, globalCubit),
+      onPrevious: () {},
+      onNext: () {},
+    );
+  }
+
+  void _handlePlayPause(
+    GlobalMusicPlayerState state,
+    SongModel currentSong,
+    GlobalMusicPlayerCubit cubit,
+  ) {
+    if ((state is GlobalMusicPlayerPlaying ||
+            state is GlobalMusicPlayerPaused) &&
+        _isSameSong(state, currentSong)) {
+      cubit.togglePlayPause();
+    } else {
+      cubit.playSong(currentSong);
+    }
+  }
+
+  bool _isSameSong(GlobalMusicPlayerState state, SongModel song) {
+    if (state is GlobalMusicPlayerPlaying) {
+      return state.currentSong.id == song.id;
+    } else if (state is GlobalMusicPlayerPaused) {
+      return state.currentSong.id == song.id;
+    }
+    return false;
   }
 
   Widget _buildAppBar(

@@ -10,13 +10,28 @@ import 'package:kiara_app_test/views/insights_details/ui/widgets/wellbeing_profi
 import 'package:kiara_app_test/views/insights_details/ui/widgets/personalized_insights_section.dart';
 import 'package:kiara_app_test/views/insights_details/ui/widgets/recommended_music_section.dart';
 import 'package:kiara_app_test/views/music_player/ui/music_player_page.dart';
-import 'package:kiara_app_test/views/music_player/ui/widgets/playlist_bottom_sheet.dart'
-    show showPlaylistBottomSheet;
 import 'package:kiara_app_test/core/models/song_model.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
-import 'package:kiara_app_test/views/global_music_player/logic/cubit/global_music_player_cubit.dart';
-import 'package:kiara_app_test/core/services/playlist_service.dart';
+import 'package:kiara_app_test/views/music_player/logic/cubit/global_music_player_cubit.dart';
 
+class _LayoutConfig {
+  static const double padding = 20;
+  static const double spacing = 24;
+  static const double largeSpacing = 32;
+  static const double bottomPadding = 100;
+  static const double buttonVerticalPadding = 16;
+  static const double buttonRadius = 16;
+
+  static const double skeletonHeaderHeight = 60;
+  static const double skeletonCard1Height = 180;
+  static const double skeletonCard2Height = 200;
+  static const double skeletonCard3Height = 150;
+  static const double skeletonCard4Height = 200;
+  static const double skeletonCard5Height = 250;
+}
+
+/// Trang hiển thị chi tiết insights về wellbeing
+/// Bao gồm: overall wellbeing, profile chart, monthly progress, insights, music recommendations
 class InsightDetailsPage extends StatefulWidget {
   const InsightDetailsPage({super.key});
 
@@ -54,43 +69,58 @@ class _InsightDetailsPageState extends State<InsightDetailsPage> {
 
   Widget _buildContent(BuildContext context, InsightDetailsLoaded state) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(_LayoutConfig.padding),
       child: AnimatedColumn(
         children: [
-          InsightsAppBar(
-            title: "Insights",
-            actionIconPath: 'assets/image/close.png',
-            onActionTap: () => Navigator.pop(context),
-          ),
-          OverallWellbeingCard(
-            overallWellbeing: state.overallWellbeing,
-            growth: state.growth,
-            checkIns: state.checkIns,
-            insightText: state.insightText,
-          ),
-          const SizedBox(height: 24),
+          _buildAppBar(context),
+          _buildOverallWellbeingCard(state),
+          const SizedBox(height: _LayoutConfig.spacing),
           WellbeingProfileChart(profile: state.wellbeingProfile),
-          const SizedBox(height: 24),
+          const SizedBox(height: _LayoutConfig.spacing),
           MonthlyProgressChart(data: state.monthlyProgress),
-          const SizedBox(height: 32),
+          const SizedBox(height: _LayoutConfig.largeSpacing),
           PersonalizedInsightsSection(insights: state.personalizedInsights),
-          const SizedBox(height: 32),
-          RecommendedMusicSection(
-            recommendations: state.recommendations,
-            onSongTap: _handleSongTap,
-          ),
+          const SizedBox(height: _LayoutConfig.largeSpacing),
+          _buildRecommendedMusic(context, state),
           const SizedBox(height: 12),
           _buildBrowseAllButton(context),
-          const SizedBox(height: 100),
+          const SizedBox(height: _LayoutConfig.bottomPadding),
         ],
       ),
     );
   }
 
-  /// Handles song tap and opens music player
+  Widget _buildAppBar(BuildContext context) {
+    return InsightsAppBar(
+      title: "Insights",
+      actionIconPath: 'assets/image/close.png',
+      onActionTap: () => Navigator.pop(context),
+    );
+  }
+
+  Widget _buildOverallWellbeingCard(InsightDetailsLoaded state) {
+    return OverallWellbeingCard(
+      overallWellbeing: state.overallWellbeing,
+      growth: state.growth,
+      checkIns: state.checkIns,
+      insightText: state.insightText,
+    );
+  }
+
+  Widget _buildRecommendedMusic(
+    BuildContext context,
+    InsightDetailsLoaded state,
+  ) {
+    return RecommendedMusicSection(
+      recommendations: state.recommendations,
+      onSongTap: _handleSongTap,
+    );
+  }
+
+  /// Xử lý khi user tap vào bài hát - load nhạc và mở music player
   void _handleSongTap(BuildContext context, SongModel song) {
-    // Play song when tapped
-    context.read<GlobalMusicPlayerCubit>().playSong(song);
+    context.read<GlobalMusicPlayerCubit>().loadSong(song);
+
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => MusicPlayerPage(song: song)),
@@ -100,46 +130,47 @@ class _InsightDetailsPageState extends State<InsightDetailsPage> {
   Widget _buildBrowseAllButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      child: ElevatedButton.icon(
+      child: ElevatedButton(
         onPressed: () => _navigateToSoundsPage(context),
-        label: const Text(
-          'Browse All Albums',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ),
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryGreen,
           foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(
+            vertical: _LayoutConfig.buttonVerticalPadding,
+          ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(_LayoutConfig.buttonRadius),
           ),
           elevation: 0,
+        ),
+        child: const Text(
+          'Browse All Albums',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );
   }
 
   void _navigateToSoundsPage(BuildContext context) {
-    // Pop back to main tab and navigate to Sounds page (index 3)
     Navigator.pop(context);
-    // The main tab will handle the navigation to index 3
   }
 
+  /// Build loading skeleton khi đang load dữ liệu
   Widget _buildLoadingSkeleton() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(_LayoutConfig.padding),
       child: AnimatedColumn(
         children: [
-          const SizedBox(height: 60),
-          _buildSkeletonCard(height: 180),
-          const SizedBox(height: 24),
-          _buildSkeletonCard(height: 200),
-          const SizedBox(height: 24),
-          _buildSkeletonCard(height: 150),
-          const SizedBox(height: 32),
-          _buildSkeletonCard(height: 200),
-          const SizedBox(height: 32),
-          _buildSkeletonCard(height: 250),
+          const SizedBox(height: _LayoutConfig.skeletonHeaderHeight),
+          _buildSkeletonCard(height: _LayoutConfig.skeletonCard1Height),
+          const SizedBox(height: _LayoutConfig.spacing),
+          _buildSkeletonCard(height: _LayoutConfig.skeletonCard2Height),
+          const SizedBox(height: _LayoutConfig.spacing),
+          _buildSkeletonCard(height: _LayoutConfig.skeletonCard3Height),
+          const SizedBox(height: _LayoutConfig.largeSpacing),
+          _buildSkeletonCard(height: _LayoutConfig.skeletonCard4Height),
+          const SizedBox(height: _LayoutConfig.largeSpacing),
+          _buildSkeletonCard(height: _LayoutConfig.skeletonCard5Height),
         ],
       ),
     );

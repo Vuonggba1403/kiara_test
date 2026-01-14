@@ -36,7 +36,6 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
       ),
     );
 
-    // Start animation immediately
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _animationController.forward();
@@ -52,7 +51,7 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
 
   List<FlSpot> _getAnimatedSpots() {
     final List<FlSpot> spots = [];
-    final lineAnimationEnd = 0.6; // Line draws until 60% of animation
+    final lineAnimationEnd = 0.6;
 
     for (int i = 0; i < widget.moodData.length; i++) {
       final targetY = widget.moodData[i].value;
@@ -60,7 +59,6 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
           ? 1.0
           : i / (widget.moodData.length - 1);
 
-      // Line drawing phase (0 to lineAnimationEnd)
       final lineProgressThreshold = pointProgress * lineAnimationEnd;
 
       if (_animation.value >= lineProgressThreshold) {
@@ -93,7 +91,6 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
     final dotAnimationStart = 0.6;
     final dotAnimationEnd = 1.0;
 
-    // Dots only appear after line is complete
     if (_animation.value < dotAnimationStart) return false;
 
     final dotAnimationProgress =
@@ -142,16 +139,11 @@ class _MoodTrendsChartState extends State<MoodTrendsChart>
     final chartWidth = renderBox.size.width;
     final chartHeight = renderBox.size.height;
 
-    // Calculate relative position
     final maxX = (widget.moodData.length - 1).toDouble();
     final relativeX = (_touchedX! / maxX) * chartWidth;
     final relativeY = (1 - (_touchedY! / 5.0)) * chartHeight;
 
-    // Position below the dot with left offset
-    return Offset(
-      relativeX - 60, // Shift left by 60px
-      relativeY + 30, // Position below the dot
-    );
+    return Offset(relativeX - 60, relativeY + 30);
   }
 
   @override

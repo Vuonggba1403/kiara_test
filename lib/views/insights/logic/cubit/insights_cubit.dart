@@ -4,6 +4,8 @@ import 'package:kiara_app_test/views/insights/logic/repositories/insights_reposi
 
 part 'insights_state.dart';
 
+/// Cubit quản lý trạng thái của trang Insights
+/// Chịu trách nhiệm load và xử lý dữ liệu mood, energy, stress
 class InsightsCubit extends Cubit<InsightsState> {
   final InsightsRepository _repository;
 
@@ -13,9 +15,10 @@ class InsightsCubit extends Cubit<InsightsState> {
     loadInsights();
   }
 
+  /// Load tất cả dữ liệu insights
+  /// Bao gồm: mood data, energy/stress data, mood dates, AI insight
   Future<void> loadInsights() async {
     try {
-      // Fetch all data from repository
       final results = await Future.wait([
         _repository.getMoodData(),
         _repository.getEnergyStressData(),
@@ -28,7 +31,6 @@ class InsightsCubit extends Cubit<InsightsState> {
       final moodDates = results[2] as Set<DateTime>;
       final aiInsight = results[3] as String;
 
-      // Calculate statistics
       final stats = await _repository.getStatistics(moodData, energyStressData);
 
       emit(
@@ -48,6 +50,7 @@ class InsightsCubit extends Cubit<InsightsState> {
   }
 }
 
+/// Model cho 1 điểm dữ liệu mood
 class MoodPoint {
   final String day;
   final double value;
@@ -55,6 +58,7 @@ class MoodPoint {
   MoodPoint({required this.day, required this.value});
 }
 
+/// Model cho 1 điểm dữ liệu energy và stress
 class EnergyStressPoint {
   final String day;
   final double energy;

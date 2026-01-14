@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-/// Custom widget for animated list with staggered animation
 class AnimatedListView extends StatelessWidget {
   final List<Widget> children;
   final ScrollController? controller;
@@ -42,7 +41,6 @@ class AnimatedListView extends StatelessWidget {
   }
 }
 
-/// Custom widget for animated column with staggered animation
 class AnimatedColumn extends StatelessWidget {
   final List<Widget> children;
   final Duration duration;
@@ -79,7 +77,6 @@ class AnimatedColumn extends StatelessWidget {
   }
 }
 
-/// Custom widget for animated list builder with staggered animation
 class AnimatedListBuilder extends StatelessWidget {
   final int itemCount;
   final Widget Function(BuildContext context, int index) itemBuilder;

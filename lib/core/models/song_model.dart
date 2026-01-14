@@ -1,4 +1,3 @@
-/// Model representing a music track
 class SongModel {
   final String id;
   final String title;

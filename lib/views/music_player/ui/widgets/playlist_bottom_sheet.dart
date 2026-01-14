@@ -4,7 +4,6 @@ import 'package:kiara_app_test/core/functions/color_extension.dart';
 import 'package:kiara_app_test/core/services/playlist_service.dart';
 import 'package:kiara_app_test/core/functions/animated_list_view.dart';
 
-/// Bottom sheet displaying playlist of songs
 class PlaylistBottomSheet extends StatefulWidget {
   final SongModel? currentSong;
   final List<SongModel>? playlist;
@@ -42,13 +41,11 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
       CurvedAnimation(parent: _tiltController, curve: Curves.easeOutCubic),
     );
 
-    // Staggered animation controller - longer duration to cover all items
     _staggerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
 
-    // Pulsing animation for play icon
     _pulsingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
@@ -57,10 +54,8 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
       CurvedAnimation(parent: _pulsingController, curve: Curves.easeInOut),
     );
 
-    // Initialize selected song
     _selectedSong = widget.currentSong;
 
-    // Start animations when bottom sheet opens
     _tiltController.forward();
     _staggerController.forward();
   }
@@ -70,7 +65,6 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
     _tiltController.dispose();
     _staggerController.dispose();
     _pulsingController.dispose();
-    // Không dispose _scrollController vì nó được quản lý bởi DraggableScrollableSheet
     super.dispose();
   }
 
@@ -82,10 +76,9 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
     );
     if (selectedIndex == -1) return;
 
-    // Đợi animation xong và bottom sheet mở hoàn toàn
+    /// Đợi animation hoàn thành rồi scroll đến item
     Future.delayed(const Duration(milliseconds: 400), () {
       if (_scrollController != null && _scrollController!.hasClients) {
-        // Mỗi item có height khoảng 72px (padding + content)
         final itemHeight = 72.0;
         final targetOffset = selectedIndex * itemHeight;
 
@@ -111,11 +104,9 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
 
         final playlist = snapshot.data!;
 
-        // Auto-select first item if no currentSong is provided
         final currentSong =
             widget.currentSong ?? (playlist.isNotEmpty ? playlist[0] : null);
 
-        // Use the selected song state
         if (_selectedSong == null && currentSong != null) {
           _selectedSong = currentSong;
         }
@@ -133,7 +124,6 @@ class _PlaylistBottomSheetState extends State<PlaylistBottomSheet>
                 minChildSize: 0.4,
                 maxChildSize: 0.9,
                 builder: (context, scrollController) {
-                  // Gán ScrollController và scroll đến vị trí selected
                   _scrollController = scrollController;
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     _scrollToSelectedItem(playlist);

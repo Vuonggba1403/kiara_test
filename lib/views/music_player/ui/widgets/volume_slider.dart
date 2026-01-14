@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 
-/// Custom volume slider widget
 class VolumeSlider extends StatefulWidget {
   const VolumeSlider({super.key});
 
@@ -10,7 +9,7 @@ class VolumeSlider extends StatefulWidget {
 }
 
 class _VolumeSliderState extends State<VolumeSlider> {
-  double _volume = 0.6; // Default 60%
+  double _volume = 0.6;
 
   @override
   Widget build(BuildContext context) {

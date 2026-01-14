@@ -1,10 +1,8 @@
 import 'package:kiara_app_test/views/insights/logic/cubit/insights_cubit.dart';
 
-/// Repository for fetching insights data
 class InsightsRepository {
-  /// Fetches mood data for the week
+  /// Lấy dữ liệu mood theo tuần
   Future<List<MoodPoint>> getMoodData() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return [
@@ -18,9 +16,7 @@ class InsightsRepository {
     ];
   }
 
-  /// Fetches energy and stress data
   Future<List<EnergyStressPoint>> getEnergyStressData() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return [
@@ -34,9 +30,7 @@ class InsightsRepository {
     ];
   }
 
-  /// Fetches mood dates for calendar
   Future<Set<DateTime>> getMoodDates() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     final now = DateTime.now();
@@ -69,20 +63,17 @@ class InsightsRepository {
     };
   }
 
-  /// Fetches AI-generated insight text
   Future<String> getAIInsight() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return 'Your mood has been trending upward this week! You seem to feel your best on Friday and Sunday. Consider what activities or habits are contributing to these positive days.';
   }
 
-  /// Calculates statistics
+  /// Tính toán thống kê trung bình
   Future<Map<String, dynamic>> getStatistics(
     List<MoodPoint> moodData,
     List<EnergyStressPoint> energyStressData,
   ) async {
-    // Simulate calculation
     await Future.delayed(const Duration(milliseconds: 50));
 
     final avgMood = moodData.isEmpty

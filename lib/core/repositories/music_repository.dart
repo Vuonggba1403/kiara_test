@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:kiara_app_test/core/models/song_model.dart';
 
-/// Repository for music/playlist data
+/// Repository quản lý dữ liệu playlist từ JSON
 class MusicRepository {
-  /// Loads playlist from JSON file
+  /// Load danh sách bài hát từ file JSON
   Future<List<SongModel>> loadPlaylist() async {
     try {
       final String jsonString = await rootBundle.loadString(
@@ -24,12 +24,10 @@ class MusicRepository {
         );
       }).toList();
     } catch (e) {
-      // Return default playlist if JSON loading fails
       return _getDefaultPlaylist();
     }
   }
 
-  /// Parses duration string to Duration object
   Duration _parseDuration(String durationStr) {
     final parts = durationStr.split(':');
     if (parts.length == 2) {
@@ -40,7 +38,6 @@ class MusicRepository {
     return const Duration(minutes: 15);
   }
 
-  /// Returns default playlist as fallback
   List<SongModel> _getDefaultPlaylist() {
     return [
       const SongModel(
@@ -91,7 +88,6 @@ class MusicRepository {
     ];
   }
 
-  /// Gets song by ID
   Future<SongModel?> getSongById(String id) async {
     final playlist = await loadPlaylist();
     try {
@@ -101,7 +97,6 @@ class MusicRepository {
     }
   }
 
-  /// Searches songs by title or artist
   Future<List<SongModel>> searchSongs(String query) async {
     final playlist = await loadPlaylist();
     final lowercaseQuery = query.toLowerCase();

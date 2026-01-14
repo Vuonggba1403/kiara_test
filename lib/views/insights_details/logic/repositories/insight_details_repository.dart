@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kiara_app_test/core/models/wellbeing_models.dart';
 
-/// Repository for fetching insight details data
 class InsightDetailsRepository {
-  /// Fetches monthly progress data
   Future<List<WeekProgress>> getMonthlyProgress() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return [
@@ -16,9 +13,7 @@ class InsightDetailsRepository {
     ];
   }
 
-  /// Fetches wellbeing profile data
   Future<WellbeingProfile> getWellbeingProfile() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return WellbeingProfile(
@@ -31,9 +26,7 @@ class InsightDetailsRepository {
     );
   }
 
-  /// Fetches recommended albums
   Future<List<RecommendedAlbum>> getRecommendedAlbums() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return [
@@ -61,9 +54,7 @@ class InsightDetailsRepository {
     ];
   }
 
-  /// Fetches personalized insights
   Future<List<PersonalizedInsight>> getPersonalizedInsights() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return [
@@ -91,9 +82,7 @@ class InsightDetailsRepository {
     ];
   }
 
-  /// Fetches overall wellbeing summary
   Future<Map<String, dynamic>> getOverallWellbeingSummary() async {
-    // Simulate API call
     await Future.delayed(const Duration(milliseconds: 50));
 
     return {

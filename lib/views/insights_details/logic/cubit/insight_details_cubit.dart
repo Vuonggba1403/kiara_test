@@ -5,6 +5,8 @@ import 'package:kiara_app_test/views/insights_details/logic/repositories/insight
 
 part 'insight_details_state.dart';
 
+/// Cubit quản lý trạng thái của trang Insight Details
+/// Chịu trách nhiệm load và quản lý dữ liệu wellbeing
 class InsightDetailsCubit extends Cubit<InsightDetailsState> {
   final InsightDetailsRepository _repository;
 
@@ -14,9 +16,10 @@ class InsightDetailsCubit extends Cubit<InsightDetailsState> {
     loadDetails();
   }
 
+  /// Load tất cả dữ liệu cho trang insight details
+  /// Bao gồm: monthly progress, wellbeing profile, recommendations, insights
   Future<void> loadDetails() async {
     try {
-      // Fetch data from repository
       final results = await Future.wait([
         _repository.getMonthlyProgress(),
         _repository.getWellbeingProfile(),
@@ -44,7 +47,6 @@ class InsightDetailsCubit extends Cubit<InsightDetailsState> {
         ),
       );
     } catch (e) {
-      // Handle error if needed
       emit(InsightDetailsInitial());
     }
   }

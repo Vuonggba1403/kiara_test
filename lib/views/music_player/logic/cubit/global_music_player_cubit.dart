@@ -5,7 +5,7 @@ import 'dart:async';
 
 part 'global_music_player_state.dart';
 
-/// Global music player cubit that persists across navigation
+/// Cubit quản lý trạng thái music player toàn cục
 class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
   GlobalMusicPlayerCubit() : super(GlobalMusicPlayerInitial());
 
@@ -14,7 +14,6 @@ class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
 
   SongModel? get currentSong => _currentSong;
 
-  /// Load bài hát mà không tự động phát (paused state)
   void loadSong(SongModel song) {
     _currentSong = song;
     _stopProgressTimer();
@@ -26,7 +25,6 @@ class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
     );
   }
 
-  /// Starts playing a song
   void playSong(SongModel song) {
     _currentSong = song;
     emit(
@@ -38,7 +36,6 @@ class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
     _startProgressTimer(Duration.zero, song.duration);
   }
 
-  /// Toggles play/pause
   void togglePlayPause() {
     final currentState = state;
     if (currentState is GlobalMusicPlayerPlaying) {
@@ -63,7 +60,6 @@ class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
     }
   }
 
-  /// Seeks to position
   void seekTo(Duration position) {
     final currentState = state;
     if (currentState is GlobalMusicPlayerPlaying) {
@@ -78,7 +74,6 @@ class GlobalMusicPlayerCubit extends Cubit<GlobalMusicPlayerState> {
     }
   }
 
-  /// Stops playback
   void stop() {
     _stopProgressTimer();
     _currentSong = null;

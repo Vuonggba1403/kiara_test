@@ -1,8 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-/// Circular album artwork with Gaussian blur background
-/// and continuous ripple animation when playing
+/// Hiển thị album art với animation ripple khi phát nhạc
 class AlbumArt extends StatefulWidget {
   final String imageUrl;
   final bool isPlaying;
@@ -23,7 +22,6 @@ class _AlbumArtState extends State<AlbumArt>
   void initState() {
     super.initState();
 
-    // Controller for continuous ripple animation
     _rippleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 3000),
@@ -38,7 +36,6 @@ class _AlbumArtState extends State<AlbumArt>
   void didUpdateWidget(covariant AlbumArt oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Sync animation with play / pause state
     if (widget.isPlaying != oldWidget.isPlaying) {
       widget.isPlaying ? _rippleController.repeat() : _rippleController.stop();
     }
@@ -70,7 +67,6 @@ class _AlbumArtState extends State<AlbumArt>
           fit: StackFit.expand,
           alignment: Alignment.center,
           children: [
-            // Album image
             Image.network(
               widget.imageUrl,
               fit: BoxFit.cover,
@@ -79,14 +75,13 @@ class _AlbumArtState extends State<AlbumArt>
               },
             ),
 
-            // Gaussian blur layer (only when playing)
+            /// Blur và ripple animation khi phát
             if (widget.isPlaying)
               BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
                 child: Container(color: Colors.black.withOpacity(0.15)),
               ),
 
-            // Ripple animation (only when playing)
             if (widget.isPlaying)
               AnimatedBuilder(
                 animation: _rippleController,
@@ -121,7 +116,7 @@ class _AlbumArtState extends State<AlbumArt>
     );
   }
 
-  /// Fallback UI when image fails to load
+  /// UI khi load ảnh thất bại
   Widget _fallbackBackground() {
     return Container(
       decoration: BoxDecoration(

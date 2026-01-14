@@ -9,6 +9,45 @@ import 'package:kiara_app_test/views/main_tab/ui/widgets/tab_button.dart';
 import 'package:kiara_app_test/views/music_player/ui/widgets/mini_player.dart';
 import 'package:kiara_app_test/core/functions/color_extension.dart';
 
+class _TabConfig {
+  static const int initialTabIndex = 1;
+  static const int totalTabs = 5;
+
+  static const double miniPlayerBottomOffset = 96;
+  static const double tabBarHeight = 76;
+  static const double tabBarPadding = 16;
+  static const double tabBarRadius = 24;
+
+  static const Duration pageTransitionDuration = Duration(milliseconds: 400);
+  static const Duration indicatorAnimationDuration = Duration(
+    milliseconds: 300,
+  );
+  static const Curve animationCurve = Curves.easeInOutCubic;
+
+  static const double blurSigma = 22;
+  static const double containerOpacity = 0.18;
+  static const double borderOpacity = 0.12;
+}
+
+class _TabItem {
+  final String iconPath;
+  final String label;
+
+  const _TabItem(this.iconPath, this.label);
+}
+
+class _TabData {
+  static const List<_TabItem> items = [
+    _TabItem('assets/image/home.png', 'Home'),
+    _TabItem('assets/image/insights.png', 'Insights'),
+    _TabItem('assets/image/mess.png', 'Kiara'),
+    _TabItem('assets/image/sounds.png', 'Sounds'),
+    _TabItem('assets/image/user.png', 'Profile'),
+  ];
+}
+
+/// Main screen với bottom navigation và page view
+/// Quản lý điều hướng giữa các màn hình chính của app
 class MainTabView extends StatefulWidget {
   const MainTabView({super.key});
 
@@ -22,7 +61,7 @@ class _MainTabViewState extends State<MainTabView> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(initialPage: 1);
+    _pageController = PageController(initialPage: _TabConfig.initialTabIndex);
   }
 
   @override
@@ -31,119 +70,154 @@ class _MainTabViewState extends State<MainTabView> {
     super.dispose();
   }
 
+  void _navigateToPage(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: _TabConfig.pageTransitionDuration,
+      curve: _TabConfig.animationCurve,
+    );
+  }
+
+  List<Widget> _buildPages() {
+    return const [
+      CommonPage(),
+      InsightsPage(),
+      CommonPage(),
+      CommonPage(),
+      CommonPage(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => MainTabCubit(),
       child: BlocBuilder<MainTabCubit, MainTabState>(
         builder: (context, state) {
-          final currentIndex = state is MainTabIndexChanged ? state.index : 1;
+          final currentIndex = _getCurrentTabIndex(state);
 
           return Scaffold(
+            backgroundColor: Colors.transparent,
             extendBody: true,
-            extendBodyBehindAppBar: true,
             body: Stack(
               children: [
-                PageView(
-                  controller: _pageController,
-                  physics: const BouncingScrollPhysics(),
-                  onPageChanged: context.read<MainTabCubit>().changeIndex,
-                  children: const [
-                    CommonPage(),
-                    InsightsPage(),
-                    CommonPage(),
-                    CommonPage(),
-                    CommonPage(),
-                  ],
-                ),
-                const Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  child: MiniPlayer(),
-                ),
+                _buildPageView(context),
+                _buildMiniPlayer(),
+                _buildBottomNavBar(currentIndex),
               ],
-            ),
-            bottomNavigationBar: Container(
-              margin: const EdgeInsets.all(16),
-              height: 80,
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.02),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.08),
-                        width: 1,
-                      ),
-                    ),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final tabWidth = constraints.maxWidth / 5;
-
-                        return Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            AnimatedPositioned(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOutCubic,
-                              left: tabWidth * currentIndex + tabWidth * 0.1,
-                              top: 10,
-                              bottom: 10,
-                              width: tabWidth * 0.8,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: AppColors.primaryGreen,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ),
-                            Row(
-                              children: List.generate(5, (index) {
-                                final data = [
-                                  ('assets/image/home.png', 'Home'),
-                                  ('assets/image/insights.png', 'Insights'),
-                                  ('assets/image/mess.png', 'Kiara'),
-                                  ('assets/image/sounds.png', 'Sounds'),
-                                  ('assets/image/user.png', 'Profile'),
-                                ][index];
-
-                                return Expanded(
-                                  child: TabButton(
-                                    iconPath: data.$1,
-                                    label: data.$2,
-                                    isActive: currentIndex == index,
-                                    onTap: () {
-                                      _pageController.animateToPage(
-                                        index,
-                                        duration: const Duration(
-                                          milliseconds: 400,
-                                        ),
-                                        curve: Curves.easeInOutCubic,
-                                      );
-                                    },
-                                  ),
-                                );
-                              }),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  ),
-                ),
-              ),
             ),
           );
         },
       ),
+    );
+  }
+
+  int _getCurrentTabIndex(MainTabState state) {
+    return state is MainTabIndexChanged
+        ? state.index
+        : _TabConfig.initialTabIndex;
+  }
+
+  Widget _buildPageView(BuildContext context) {
+    return PageView(
+      controller: _pageController,
+      physics: const BouncingScrollPhysics(),
+      onPageChanged: context.read<MainTabCubit>().changeIndex,
+      children: _buildPages(),
+    );
+  }
+
+  Widget _buildMiniPlayer() {
+    return const Positioned(
+      left: 0,
+      right: 0,
+      bottom: _TabConfig.miniPlayerBottomOffset,
+      child: MiniPlayer(),
+    );
+  }
+
+  Widget _buildBottomNavBar(int currentIndex) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Padding(
+        padding: const EdgeInsets.all(_TabConfig.tabBarPadding),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(_TabConfig.tabBarRadius),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: _TabConfig.blurSigma,
+              sigmaY: _TabConfig.blurSigma,
+            ),
+            child: Container(
+              height: _TabConfig.tabBarHeight,
+              decoration: _buildTabBarDecoration(),
+              child: _buildTabBarContent(currentIndex),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  BoxDecoration _buildTabBarDecoration() {
+    return BoxDecoration(
+      color: Colors.black.withOpacity(_TabConfig.containerOpacity),
+      borderRadius: BorderRadius.circular(_TabConfig.tabBarRadius),
+      border: Border.all(
+        color: Colors.white.withOpacity(_TabConfig.borderOpacity),
+      ),
+    );
+  }
+
+  Widget _buildTabBarContent(int currentIndex) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final tabWidth = constraints.maxWidth / _TabConfig.totalTabs;
+
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            _buildActiveIndicator(currentIndex, tabWidth),
+            _buildTabButtons(currentIndex),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildActiveIndicator(int currentIndex, double tabWidth) {
+    return AnimatedPositioned(
+      duration: _TabConfig.indicatorAnimationDuration,
+      curve: _TabConfig.animationCurve,
+      left: tabWidth * currentIndex + tabWidth * 0.1,
+      top: 8,
+      bottom: 8,
+      width: tabWidth * 0.8,
+      child: Container(
+        decoration: BoxDecoration(
+          color: AppColors.primaryGreen,
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTabButtons(int currentIndex) {
+    return Row(
+      children: List.generate(_TabConfig.totalTabs, (index) {
+        final tabItem = _TabData.items[index];
+
+        return Expanded(
+          child: TabButton(
+            iconPath: tabItem.iconPath,
+            label: tabItem.label,
+            isActive: currentIndex == index,
+            onTap: () => _navigateToPage(index),
+          ),
+        );
+      }),
     );
   }
 }
